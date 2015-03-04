@@ -178,10 +178,10 @@ function set_block_coordinates(block_element, coordinates) {
 // Main menu in offline mode
 function setMenu() {
     var menu = gId('menu');
-    var menu_elements = menu.children;
+    var menu_elements = menu.getElementsByTagName("a");
     for (var i = 0; i < menu_elements.length; i++) {
-        if (menu_elements[i].textContent != "my stories") {
-            menu_elements[i].style.display = 'none';
+        if (menu_elements[i].getAttribute("href") != "/my_stories/") {
+            menu.children[i].style.display = 'none';
         }
     }
 }
