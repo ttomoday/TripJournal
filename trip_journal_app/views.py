@@ -19,12 +19,14 @@ from django.utils.translation import get_language_info
 from django.utils.translation import activate
 from django.utils import translation
 from django.conf import settings as TripJournal_settings
+from localization.views import try_activate_user_language
 
 
 def home(request):
     """
     Home page view.
     """
+    try_activate_user_language(request)
     stories = Story.objects.filter(published=True)
     context = {'stories': stories, 'user': auth.get_user(request)}
     return render(request, 'index.html', context)
@@ -94,6 +96,7 @@ def upload_img(request, story_id):
 
 
 def story(request, story_id):
+    try_activate_user_language(request)
     if story_id:
         return story_contents(request, story_id, 'story.html',
                               check_published=True)
@@ -107,6 +110,7 @@ def edit(request, story_id):
     '''
     Edit page view.
     '''
+    try_activate_user_language(request)
     return story_contents(request, story_id, 'edit.html', check_user=True)
 
 
@@ -125,6 +129,7 @@ def show_story_near_by_page(request):
     """
     Search stories near by page
     """
+    try_activate_user_language(request)
     return render(
         request, 'items_near_by.html', {'item_type': 'stories'})
 
@@ -133,6 +138,7 @@ def show_picture_near_by_page(request):
     """
     Search pictures near by page
     """
+    try_activate_user_language(request)
     return render(
         request, 'items_near_by.html', {'item_type': 'pictures'})
 
@@ -254,11 +260,11 @@ def get_story_content(request):
         pictures = Picture.objects.filter(story_id=int(story_id))
         picture_dic = {}
         for picture in pictures:
-            picture_dic[str(picture.id)] = str(picture.get_stored_pic_by_size(
+            picture_dic[unicode(picture.id)] = unicode(picture.get_stored_pic_by_size(
                 800))
 
-        content = {"text": str(story.text), "title": str(story.title),
-                   "datetime": str(story.date_publish),
+        content = {"text": unicode(story.text), "title": unicode(story.title),
+                   "datetime": unicode(story.date_publish),
                    "picture": picture_dic}
 
         return HttpResponse(json.dumps(content))
@@ -294,6 +300,7 @@ def show_authorization_page(request):
 
 
 def stories_by_user(request):
+    try_activate_user_language(request)
     stor = csrf(request)
     if request.method == 'GET':
         needed_user = str(request.GET.get('needed_user', ''))
@@ -309,6 +316,7 @@ def check_connection(request):
     return HttpResponse(status=200)
 
 def settings(request):
+    try_activate_user_language(request)
     args={}
     args.update(csrf(request))
     if request.user.is_authenticated():    
@@ -327,3 +335,5 @@ def logout(request):
     auth.logout(request)
     request.session[translation.LANGUAGE_SESSION_KEY] =''
     return redirect('/')
+
+

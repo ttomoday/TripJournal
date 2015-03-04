@@ -14,10 +14,10 @@ window.onload = function() {
     }
 
     //EventListeners
-    gId('add_title').addEventListener("click", addTitle);
-    gId('story_title').addEventListener("blur", savePage);
-    gId('tag_input').addEventListener("change", tags_add);
-    gId('tag_add').addEventListener("click", tags_add);
+    gId('add_title').addEventListener("click", addTitle); // add title of story
+    gId('story_title').addEventListener("blur", savePage);// save page
+    gId('tag_input').addEventListener("change", tags_add); // add tag
+    gId('tag_add').addEventListener("click", tags_add); //
     gId('type_file').addEventListener("change", add_img);
     gId('story_content').addEventListener("mouseover", showKeybar);
     gId('story_content').addEventListener("mouseout", hideKeybar);
