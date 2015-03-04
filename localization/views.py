@@ -16,7 +16,7 @@ def change_language(request):
     return redirect('/settings/')
 
 
-def activate_user_language(request):
+def try_activate_user_language(request):
     if request.user.is_authenticated():
         user=request.user
         profile=user.profile
