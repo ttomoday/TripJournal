@@ -34,13 +34,13 @@
             {% else %}
                 <div>
                     {% trans "sign in" %}:
-                    <a href="{% url 'social:begin' 'google-oauth2' %}?next=/localization/change_language_social{{ request.path }}">
+                    <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request|login_next }}">
                         <div class='login_image'><img src="{% static "images/Google_Plus_logo.png"%}"></div>
                     </a>
-                    <a href="{% url 'social:begin' 'facebook' %}?next=/localization/change_language_social{{ request.path }}">
+                    <a href="{% url 'social:begin' 'facebook' %}?next={{ request|login_next }}">
                         <div class='login_image'><img src="{% static "images/fb_logo.png"%}"></div>
                     </a>
-                    <a href="{% url 'social:begin' 'vk-oauth2' %}?next=/localization/change_language_social{{ request.path }}">
+                    <a href="{% url 'social:begin' 'vk-oauth2' %}?next={{ request|login_next }}">
                         <div class='login_image'><img src="{% static "images/vk_logo.png"%}"></div>
                     </a>
                 </div>
