@@ -186,7 +186,6 @@ function setMenu() {
     }
 }
 
-
 //add title of story
 function addTitle(e) {
     var titleInput = gId("title");
