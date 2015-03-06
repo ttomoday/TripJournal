@@ -4,19 +4,23 @@ import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.backends.db import SessionStore
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
-
 from django.contrib.auth.models import User
-
 from trip_journal_app.models import Story, Picture, Tag, Map_artifact, Subscriptions
-
 from trip_journal_app.forms import UploadFileForm
 from trip_journal_app.utils.story_utils import story_contents
+from django.core.context_processors import csrf
+from django.utils.translation import get_language_info
+from django.utils.translation import activate
+from django.utils import translation
+from django.conf import settings as TripJournal_settings
+
 
 
 def home(request):
@@ -50,11 +54,11 @@ def save(request, story_id):
         story.date_publish = datetime.datetime.now()
         story.save()
         for block in request_body['blocks']:
-            if block["type"]=="img":
-                if block["marker"]!=None:                
-                    picture=Picture.objects.get(id=block["id"])
-                    picture.latitude=block["marker"]["lat"]
-                    picture.longitude=block["marker"]["lng"]
+            if block["type"] == "img":
+                if block["marker"] != None:
+                    picture = Picture.objects.get(id=block["id"])
+                    picture.latitude = block["marker"]["lat"]
+                    picture.longitude = block["marker"]["lng"]
                     picture.save()
         return HttpResponse(story.id)
 
@@ -249,10 +253,40 @@ def get_story_tags(request):
     """
     Get tags from story
     """
+    tags_data = []
     if request.is_ajax():
         story_id = request.GET.get('Story_id')
         story = Story.objects.get(pk=story_id)
-        return HttpResponse({','.join(str(x) for x in story.tags.all())})
+
+        for tag in story.tags.all():
+            tags_data.append({"name": str(tag), "datetime": str(
+                tag.datetime)})
+
+        return HttpResponse(json.dumps(tags_data))
+
+
+@ensure_csrf_cookie
+def get_story_content(request):
+    """
+    Get text from story
+    """
+    if request.is_ajax():
+        story_id = request.GET.get('id')
+        story = Story.objects.get(pk=int(story_id))
+        pictures = Picture.objects.filter(story_id=int(story_id))
+        picture_dic = {}
+        for picture in pictures:
+            picture_dic[str(picture.id)] = str(picture.get_stored_pic_by_size(
+                800))
+
+        content = {"text": str(story.text), "title": str(story.title),
+                   "datetime": str(story.date_publish),
+                   "picture": picture_dic}
+
+        return HttpResponse(json.dumps(content))
+        # return HttpResponse(status=200)
+    else:
+        return HttpResponse("REQUEST ERROR")
 
 
 @login_required
@@ -291,6 +325,31 @@ def stories_by_user(request):
             stories = Story.objects.filter(user=needed_user)
         context = {'stories': stories}
         return render(request, 'stories_by_user.html', context)
+
+
+def check_connection(request):
+    return HttpResponse(status=200)
+
+
+def settings(request):
+    args={}
+    args.update(csrf(request))
+    if request.user.is_authenticated():    
+        args['user']=request.user
+    current_language=get_language_info(request.LANGUAGE_CODE)
+    args['current_language']=current_language
+    another_language=[]
+    for lang in TripJournal_settings.LANGUAGES:
+        if lang[0] != request.LANGUAGE_CODE:
+            another_language.append(get_language_info(lang[0]))
+    args['another_language']=another_language
+    return render(request, "settings.html", args)
+
+
+def logout(request):
+    auth.logout(request)
+    request.session[translation.LANGUAGE_SESSION_KEY] =''
+    return redirect('/')
 
 
 @login_required

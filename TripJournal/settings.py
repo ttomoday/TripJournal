@@ -25,7 +25,7 @@ from utils import client_key_and_secret
 SECRET_KEY = '@n=0!!+!agam579351jf=+ka7xp&-6j)ofv_2j38au#$lp@hv4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = True
 
@@ -47,14 +47,16 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
     'trip_journal_app',
     'social.apps.django_app.default',
+    'localization',
+    # 'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -77,6 +79,7 @@ DATABASES = {
         'NAME': 'TripJournal',
         'USER': local_settings.db_user,
         'PASSWORD': local_settings.db_password,
+        
     }
 }
 
@@ -84,6 +87,11 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = (
+    ('uk', 'Ukraine'),
+    ('en', 'English'),
+)
 
 TIME_ZONE = 'UTC'
 
@@ -123,16 +131,19 @@ AUTHENTICATION_BACKENDS = (
 )
 
 CLIENT_SECRETS_DIR = os.path.join(BASE_DIR, 'TripJournal', 'client_secrets')
-"""
+
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY, SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = (
-    client_key_and_secret(CLIENT_SECRETS_DIR, 'google')
+     client_key_and_secret(CLIENT_SECRETS_DIR, 'google')
 )
 SOCIAL_AUTH_FACEBOOK_KEY, SOCIAL_AUTH_FACEBOOK_SECRET = (
-    client_key_and_secret(CLIENT_SECRETS_DIR, 'facebook')
+     client_key_and_secret(CLIENT_SECRETS_DIR, 'facebook')
 )
 SOCIAL_AUTH_VK_OAUTH2_KEY, SOCIAL_AUTH_VK_OAUTH2_SECRET = (
-    client_key_and_secret(CLIENT_SECRETS_DIR, 'vk')
+     client_key_and_secret(CLIENT_SECRETS_DIR, 'vk')
 )
-"""
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+ )
