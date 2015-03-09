@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+    <html>
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>Edit story</title>
+        
+        <link rel="stylesheet" href="/static/css/base.css">
+        <link rel="stylesheet" href="/static/css/edit.css">
+    
+        <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,300,500,400italic&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>        
+
+        <script type="text/javascript" src="/static/offline/ajax_offline.js"></script>
+        <script type="text/javascript" src="/static/offline/edit_offline.js"></script>
+    
+    </head>
+    <body>
+        <div id="header">
+            
+            <div id='cite_name'>
+                <p><a href=/>Trip Journal</a></p>
+            </div>
+            
+        </div>
+        <div id="menu">
+            
+            <div><a href="/stories_near_by/">історії поблизу</a></div>
+            <div><a href="/pictures_near_by/">картинки поблизу</a></div>
+            <div><a href="/settings">настройки</a></div>
+            
+                <div><a href="/my_stories/">мої історії</a></div>
+                <div>
+                    <a href="/logout">вийти mark</a>
+                </div>
+            
+            
+        </div>
+        <div id="messages">
+            
+        </div>
+        <div id="content">
+            
+    <div id="map-canvas-wrapper">
+        <div id="panel">
+            <input id="address" type="textbox" value="">
+            <input type="button" id="findAddres" value=' Знайти'>
+        </div>
+        <div id="map-canvas"></div>
+    </div>
+
+    <main>
+    <div id="story_content" class="block">
+        
+        <div id="title_panel" class="block">
+            <h2 id="story_title" contenteditable="true" class="hidden"></h2>
+            <input id="title" type="text" name="title_story" class="text_story" placeholder='+ Заголовок історії'>
+            <button id="add_title" class="button_2">+</button>
+        </div>
+         
+        <div id="tags_list">
+            <div id="button_list"></div>
+            <div id="tag_input_block">
+                <input type="text" id="tag_input" placeholder='+ Теги'>
+                <span id="tag_add">+</span>
+            </div>
+        </div>        
+    </div>
+        <div id="photo_panel" class="block hide">
+            <div id="file">
+                <form id="file-form">
+                 <input id="type_file" type="file" class="add_file" name="img" multiple>
+                </form>
+            </div>
+
+            <div id="photo_cont" class="">
+            </div>
+            <br>
+
+            <button id="adds_block_p" class="button_2 adds_block">+</button>
+            <button id="clear_block_p" class="button_2 delete_block">-</button>
+
+        </div>
+
+    <div id="text_panel" class="block hide" >
+            <textarea id="textarea" name="text" class="element_story" placeholder='+ текст історії'></textarea>
+            <br>
+            <button id="adds_block_t" class="button_2 adds_block">+</button>
+            <button id="clear_block_t" class="button_2 delete_block">-</button>
+
+        </div>
+
+        <div id="artifact_panel" class="block hide">
+            <textarea id="textarea_artifact" name="artifact" class="element_story" placeholder='+ артефакт історії'></textarea>
+            <br>
+            <button id="adds_block_a" class="button_2 adds_block">+</button>
+            <button id="clear_block_a" class="button_2 delete_block">-</button>
+        </div>
+
+
+        <div id="add_panel" class="block">
+            <div id="added_text" class="add_block">
+                <span class="block_title"> текст</span>
+            </div>
+            <div id="added_image" class="add_block">
+                <span class="block_title">картинка</span>
+            </div>
+            <div id="added_artifact" class="add_block">
+                <span class="block_title">артефакт</span>
+            </div>
+
+        </div>
+ 
+        
+        <div id="publish_panel" class="invisible">
+           <form id="view_form" action="/story/0">
+                <input type="submit" value='Переглянути' class="button" id="view">
+            </form>
+            
+<form id="publish_form" action=/publish/0 method="POST">
+<input type='hidden' name='csrfmiddlewaretoken' value='Yjc3VDLm7uLgNSeExL6iHayxXJNLeDX3' />
+    <input class="button" type="hidden" name="publish" value=False>
+    
+        <input class="button" type="submit" value='Опублікувати'>
+    
+</form>
+        
+        </div>
+    </main>
+    
+        </div>
+    </body>
+</html>

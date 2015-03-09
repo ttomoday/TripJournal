@@ -1,0 +1,19 @@
+CACHE MANIFEST
+# revision 2015-03-08 19:14:48.174169
+
+../css/base.css
+../css/edit.css
+../images/arrow-down.png
+../images/arrow-up.png
+../images/artifact_marker.png
+../images/delete.png
+../images/deletemarker.png
+../images/marker.png
+ajax_offline.js
+edit_offline.js
+
+FALLBACK:
+/ offline.html
+
+NETWORK:
+*
