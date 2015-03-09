@@ -246,7 +246,7 @@ def get_story_tags(request):
         story = Story.objects.get(pk=story_id)
 
         for tag in story.tags.all():
-            tags_data.append({"name": str(tag), "datetime": str(
+            tags_data.append({"name": unicode(tag), "datetime": unicode(
                 tag.datetime)})
 
         return HttpResponse(json.dumps(tags_data))
