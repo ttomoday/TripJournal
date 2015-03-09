@@ -15,7 +15,7 @@ window.onload = function() {
 
     //EventListeners
     gId('add_title').addEventListener("click", addTitle); // add title of story
-    gId('story_title').addEventListener("blur", savePage);// save page
+    gId('story_title').addEventListener("blur", savePage); // save page
     gId('tag_input').addEventListener("change", tags_add); // add tag
     gId('tag_add').addEventListener("click", tags_add); //
     gId('type_file').addEventListener("change", add_img);
@@ -63,18 +63,30 @@ function getStoryContent() {
             xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
             xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
             xhr.send();
+        } else {
+            var localStorage_content = getLocalStorageContent()
+            initialize_story(localStorage_content);
         }
     } else {
-        var str = localStorage.getItem("Block_content");
-        var content = JSON.parse(str);
-        if (content) {
-            initialize_story(content[0]);
-        }
+        var localStorage_content = getLocalStorageContent()
+        initialize_story(localStorage_content);
+    }
+}
+
+function getLocalStorageContent() {
+    var str = localStorage.getItem("Block_content");
+    var content = JSON.parse(str);
+    if (content) {
+        return content[0];
     }
 }
 
 // Check type of block content, and call right function
 function initialize_story(content) {
+    var server_datetime = content.datetime;
+    var localStorage_content = getLocalStorageContent();
+    var localStorage_datetime = localStorage_content.datetime;
+
     if (content.title) {
         title_view(content.title);
     }
@@ -99,6 +111,15 @@ function initialize_story(content) {
                     show_pictures(galleryId, imgs, marker);
                 }
             }
+        } else {
+            for (var i = 0; i < content.blocks.length; i++) {
+                if (content.blocks[i].type === "text") {
+                    text_view(content.blocks[i].content);
+                }
+                if (content.blocks[i].type === "artifact") {
+                    artifact_view(content.blocks[i].content);
+                }
+            };
         }
 
     } else {
@@ -169,7 +190,7 @@ function show_pictures(galleryId, imgs, marker_coordinates) {
 
 // set coordinates in block
 function set_block_coordinates(block_element, coordinates) {
-    if (coordinates !== null) {
+    if (coordinates != null && coordinates != "undefined") {
         block_element.parentNode.setAttribute("data-lat", coordinates.lat);
         block_element.parentNode.setAttribute("data-lng", coordinates.lng);
     }

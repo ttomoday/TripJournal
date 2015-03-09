@@ -269,6 +269,9 @@ def get_story_content(request):
         content = {"text": unicode(story.text), "title": unicode(story.title),
                    "datetime": unicode(story.date_publish),
                    "picture": picture_dic}
+        print "=" * 50
+        print content
+        print "=" * 50
 
         return HttpResponse(json.dumps(content))
         # return HttpResponse(status=200)

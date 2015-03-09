@@ -45,6 +45,7 @@ function getMarkerLocation(index) {
 function storyBlocksJson() {
     var blocks = [];
     var datetime = new Date();
+    datetime.setMinutes(datetime.getMinutes() - 1);
 
     story_title = document.getElementById("story_title")
     if (story_title.childNodes[0]) {
@@ -179,6 +180,7 @@ function savePage() {
 
 function jsonTagStory(tag_name) {
     var datetime = new Date();
+    datetime.setMinutes(datetime.getMinutes() - 1);
     var block = {};
     block.story_id = storyIdFromUrl();
     block.tag_name = tag_name;
@@ -187,7 +189,7 @@ function jsonTagStory(tag_name) {
 }
 
 function putTag(tag_name) {
-    var tag_input=gId('tag_input')
+    var tag_input = gId('tag_input')
     if (checkServerConnection()) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/put_tag/', true);
@@ -289,6 +291,13 @@ function tags_view(tags_arr) {
 }
 
 function deleteStoryTags(i) {
+    if (supportsLocalStorage()) {
+        var tags = localStorage.getItem("Tag");
+        var new_tags = JSON.parse(tags);
+        new_tags.splice(i, 1);
+        localStorage.setItem("Tag", JSON.stringify(new_tags));
+        getStoryTags();
+    }
     var xhr = new XMLHttpRequest();
     story_id = storyIdFromUrl();
     xhr.onreadystatechange = function() {
@@ -335,7 +344,7 @@ function addToLocalStorrage(key, json_value) {
             json_list.push(JSON.parse(localStorage.getItem(key))[i]);
         }
     }
-    
+
     json_list.push(parsed_json);
     localStorage.setItem(key, JSON.stringify(json_list));
 }
