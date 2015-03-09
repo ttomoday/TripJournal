@@ -50,7 +50,77 @@ function deleteStoryTags(i) {
     getStoryTags();
 }
 
+function savePage() {
+    if (storyIdFromUrl().length === 0) postData(false);
+    if (Images.length > 0) {
+        postImages();
+    } else {
+        postData(true);
+    }
+}
 
+function postData(async) {
+    requestBody = JSON.stringify(storyBlocksJson());
+    addToLocalStorrage("Block_content", requestBody);
+}
+
+function storyBlocksJson() {
+    var blocks = [];
+    var datetime = new Date();
+
+    story_title = document.getElementById("story_title")
+    if (story_title.childNodes[0]) {
+        var title = story_title.childNodes[0].nodeValue
+    } else {
+        var title = "";
+    }
+
+    var Blocks = document.getElementsByClassName("block_story");
+    // alert(Blocks.length);
+    for (var i = 0; i < Blocks.length; i++) {
+        var block = {
+            "type": Blocks[i].getAttribute("block_type"),
+            "marker": getMarkerLocation(i)
+        };
+        if (block.type === 'text') {
+            block.content = Blocks[i].children[0].innerHTML;
+        }
+        if (block.type === 'artifact') {
+            block.content = Blocks[i].children[0].innerHTML;
+        }
+        if (block.type === 'img') {
+            var imagesInBlock = Blocks[i].getElementsByClassName("image_story");
+            // alert(imagesInBlock.length);
+            if (imagesInBlock.length > 1) {
+                block["galleryId"] = [];
+                block.id = parseInt(imagesInBlock[0].getAttribute("data-dbid"));
+                block["galleryId"][0] = parseInt(imagesInBlock[0].getAttribute("data-dbid"));
+                for (var j = 1; j < imagesInBlock.length; j++) {
+                    block["galleryId"][j] = parseInt(imagesInBlock[j].getAttribute("data-dbid"));
+                }
+            } else {
+                block.id = parseInt(imagesInBlock[0].getAttribute("data-dbid"));
+            }
+        }
+        blocks.push(block)
+    }
+    return {
+        'datetime': datetime,
+        'title': title,
+        'blocks': blocks
+    };
+}
+
+function getMarkerLocation(index) {
+    if (Markers[index]) {
+        var pos = Markers[index].getPosition();
+        return {
+            'lat': pos.lat(),
+            'lng': pos.lng()
+        };
+    }
+    return null;
+}
 
 // Add JSON to localStorage 
 function addToLocalStorrage(key, json_value) {

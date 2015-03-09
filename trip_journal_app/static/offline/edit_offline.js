@@ -4,31 +4,31 @@ var Markers = []; //Array of markers, index of marker in this array is equal to 
 window.onload = function() {
     alert("OFFLINE");
     setMenu();
-    // getStoryContent(); // get story content using AJAX
+    getStoryContent(); // get story content using AJAX
     getStoryTags(); // get story tegs using AJAX
 
 
     //EventListeners
-    // gId('add_title').addEventListener("click", addTitle);
-    // gId('story_title').addEventListener("blur", savePage);
-    // gId('tag_input').addEventListener("change", tags_add);
+    gId('add_title').addEventListener("click", addTitle);
+    gId('story_title').addEventListener("blur", savePage);
+    gId('tag_input').addEventListener("change", tags_add);
     gId('tag_add').addEventListener("click", tags_add);
     // gId('type_file').addEventListener("change", add_img);
-    // gId('story_content').addEventListener("mouseover", showKeybar);
-    // gId('story_content').addEventListener("mouseout", hideKeybar);
-    // gId('story_content').addEventListener("click", buttonsClick);
-    // gId("added_artifact").addEventListener("click", showArtifactPanel);
+    gId('story_content').addEventListener("mouseover", showKeybar);
+    gId('story_content').addEventListener("mouseout", hideKeybar);
+    gId('story_content').addEventListener("click", buttonsClick);
+    gId("added_artifact").addEventListener("click", showArtifactPanel);
     // gId("added_image").addEventListener("click", showImagePanel);
-    // gId("added_text").addEventListener("click", showTextPanel);
-    // gId("adds_block_t").addEventListener("click", save_text_story);
+    gId("added_text").addEventListener("click", showTextPanel);
+    gId("adds_block_t").addEventListener("click", save_text_story);
     // gId("adds_block_p").addEventListener("click", save_photo_story);
     // gId('photo_cont').addEventListener("click", deleteImageFromPhotoCont);
-    // gId("adds_block_a").addEventListener("click", save_photo_artifact);
+    gId("adds_block_a").addEventListener("click", save_photo_artifact);
     // gId('findAddres').addEventListener("click", codeAddress);
-    // clearBlocks = document.getElementsByClassName("delete_block")
-    // for (var i = 0; i < clearBlocks.length; i++) {
-    //     clearBlocks[i].addEventListener("click", clear);
-    // }
+    clearBlocks = document.getElementsByClassName("delete_block")
+    for (var i = 0; i < clearBlocks.length; i++) {
+        clearBlocks[i].addEventListener("click", clear);
+    }
 
     // call function what I have to do.
     toDo();
@@ -52,29 +52,10 @@ function gId(id) {
 
 // Get content from server
 function getStoryContent() {
-    if (serverConnect) {
-        story_id = storyIdFromUrl();
-        if (story_id) {
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var str = xhr.responseText;
-                    var content = JSON.parse(str);
-                    initialize_story(content);
-                }
-            }
-            params = 'id=' + story_id;
-            xhr.open('GET', '/get_story_content/?' + params, false);
-            xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
-            xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-            xhr.send();
-        }
-    } else {
-        var str = localStorage.getItem("Block_content");
-        var content = JSON.parse(str);
-        if (content) {
-            initialize_story(content[0]);
-        }
+    var str = localStorage.getItem("Block_content");
+    var content = JSON.parse(str);
+    if (content) {
+        initialize_story(content[0]);
     }
 }
 
@@ -83,39 +64,15 @@ function initialize_story(content) {
     if (content.title) {
         title_view(content.title);
     }
-    if (serverConnect) {
 
-        if (content.text) {
-            content_list = JSON.parse(content.text);
-            for (var i = 0; i < content_list.length; i++) {
-                var marker = content_list[i].marker
-                    // create text block
-                if (content_list[i].type === "text") {
-                    text_view(content_list[i].content, marker);
-                }
-                // create artifack block
-                if (content_list[i].type === "artifact") {
-                    artifact_view(content_list[i].content, marker);
-                }
-                // create image or gallery block
-                if (content_list[i].type === "img") {
-                    var galleryId = content_list[i].galleryId || [content_list[i].id];
-                    var imgs = content.picture;
-                    show_pictures(galleryId, imgs, marker);
-                }
-            }
+    for (var i = 0; i < content.blocks.length; i++) {
+        if (content.blocks[i].type === "text") {
+            text_view(content.blocks[i].content);
         }
-
-    } else {
-        for (var i = 0; i < content.blocks.length; i++) {
-            if (content.blocks[i].type === "text") {
-                text_view(content.blocks[i].content);
-            }
-            if (content.blocks[i].type === "artifact") {
-                artifact_view(content.blocks[i].content);
-            }
-        };
-    }
+        if (content.blocks[i].type === "artifact") {
+            artifact_view(content.blocks[i].content);
+        }
+    };
 }
 
 // view title on page
@@ -174,7 +131,7 @@ function show_pictures(galleryId, imgs, marker_coordinates) {
 
 // set coordinates in block
 function set_block_coordinates(block_element, coordinates) {
-    if (coordinates !== null) {
+    if (coordinates != null && coordinates != "undefined") {
         block_element.parentNode.setAttribute("data-lat", coordinates.lat);
         block_element.parentNode.setAttribute("data-lng", coordinates.lng);
     }
