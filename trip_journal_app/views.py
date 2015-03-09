@@ -20,6 +20,7 @@ from django.utils.translation import activate
 from django.utils import translation
 from django.conf import settings as TripJournal_settings
 from localization.views import try_activate_user_language
+from TripJournal.settings import BASE_DIR, STATIC_URL
 
 
 def home(request):
@@ -111,6 +112,7 @@ def edit(request, story_id):
     Edit page view.
     '''
     try_activate_user_language(request)
+    change_manifest()
     return story_contents(request, story_id, 'edit.html', check_user=True)
 
 
@@ -215,6 +217,7 @@ def delete(request, story_id):
     user = auth.get_user(request)
     if user != story.user:
         return HttpResponse('Unathorized', status=401)
+    change_manifest()
     story.delete()
     return redirect(reverse('user_stories'))
 
@@ -315,25 +318,40 @@ def stories_by_user(request):
 def check_connection(request):
     return HttpResponse(status=200)
 
+
+def change_manifest():
+    manifest_file = str(BASE_DIR + "/trip_journal_app" + STATIC_URL +
+                        "offline/offline.appcache")
+    now = datetime.datetime.now()
+
+    with open(manifest_file, "r") as actual_file:
+        actual_file.seek(0)
+        new_file = actual_file.readlines()
+    actual_file.close()
+
+    new_file[1] = "# revision {0}\n".format(now)
+    manifest = open(manifest_file, "w")
+    manifest.writelines(new_file)
+    manifest.close()
+
+
 def settings(request):
     try_activate_user_language(request)
-    args={}
+    args = {}
     args.update(csrf(request))
-    if request.user.is_authenticated():    
-        args['user']=request.user
-    current_language=get_language_info(request.LANGUAGE_CODE)
-    args['current_language']=current_language
-    another_language=[]
+    if request.user.is_authenticated():
+        args['user'] = request.user
+    current_language = get_language_info(request.LANGUAGE_CODE)
+    args['current_language'] = current_language
+    another_language = []
     for lang in TripJournal_settings.LANGUAGES:
         if lang[0] != request.LANGUAGE_CODE:
             another_language.append(get_language_info(lang[0]))
-    args['another_language']=another_language
+    args['another_language'] = another_language
     return render(request, "settings.html", args)
 
 
 def logout(request):
     auth.logout(request)
-    request.session[translation.LANGUAGE_SESSION_KEY] =''
+    request.session[translation.LANGUAGE_SESSION_KEY] = ''
     return redirect('/')
-
-

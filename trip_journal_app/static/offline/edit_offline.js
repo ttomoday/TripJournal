@@ -2,7 +2,7 @@ var Images = []; //Array of pictures that will be uploaded.
 var Markers = []; //Array of markers, index of marker in this array is equal to the index of the block that it belongs. 
 
 window.onload = function() {
-    alert("OFFLINE");
+    alert("OFFLINE NEW");
     setMenu();
     // getStoryContent(); // get story content using AJAX
     getStoryTags(); // get story tegs using AJAX
