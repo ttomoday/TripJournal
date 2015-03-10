@@ -16,9 +16,12 @@
 
 {% block content %}
 <div id="content_story_near_by">
-    <h1>{{item_type}}</h2>
     <div id="here">
-        {% trans "Here you can find  the closest stories to  you"%} <span> {% trans "or any place "%}</span>
+        {% if item_type == 'story' %}
+            {% trans "Here you can find  stories near  you"%} <span> {% trans "or any place "%}</span>
+        {% else %}
+            {% trans "Here you can find  pictures near  you"%} <span> {% trans "or any place "%}</span>
+        {% endif %}
     </div>
     <div id="hide_scroll">
         <div id="story_container">     
@@ -27,10 +30,13 @@
    
     <div id='google_api'>       
         <div id="panel">
-            {% csrf_token %}
-           
+            {% csrf_token %}          
             <input id="address" type="text" value='' placeholder=' {% trans "Enter place" %}' autocomplete='off'>
-            <input type="button" id="findAddres" value=' {% trans "Search stories" %}'>
+            {% if item_type == 'story' %}
+                <input type="button" id="findAddres" value=' {% trans "Search stories" %}'>
+            {% else %}
+                 <input type="button" id="findAddres" value=' {% trans "Search pictures" %}'>
+            {% endif %}
         </div>
         <div id="map_canvas">
         </div>

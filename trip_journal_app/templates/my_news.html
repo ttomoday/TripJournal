@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load staticfiles %}
 {% load trip_journal_extras %}
 {% block title %}My news{% endblock %}
@@ -7,7 +8,7 @@
 <link rel="stylesheet" href="{% static "css/my_news.css" %}">
 {% endblock %}
 {% block content %}
-    <h2>Latest publications of my subscriptions</h2>
+    <h2>{% trans "Latest publications of my subscriptions" %}</h2>
     {% if exception %}
         <h2>{{exception}}</h2>
     {% else %}
