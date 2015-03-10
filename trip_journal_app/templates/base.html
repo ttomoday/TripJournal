@@ -1,4 +1,5 @@
 {% load i18n %}
+{% language user.profile.user_language %}
 <!DOCTYPE html>
 {% block manifest %}
 <html>
@@ -26,6 +27,7 @@
             <div><a href="{% url 'stories_near_by' %}">{% trans "stories nearby" %}</a></div>
             <div><a href="{% url 'pictures_near_by' %}">{% trans "pictures nearby" %}</a></div>
             <div><a href="/settings">{% trans "settings" %}</a></div>
+            <div><a href="{% url 'rss' %}">RSS</a></div>
             {% if user and not user.is_anonymous %}
                 <div><a href="{% url 'user_stories' %}">{% trans "my stories" %}</a></div>
                 <div><a href="{% url 'my_news' %}">{% trans "my news" %}</a></div>
@@ -55,7 +57,7 @@
                     {%endif%}
                 </div>
             {% endif %}
-            <div><a href="{% url 'rss' %}">RSS</a></div>
+            
             {% endblock %}
         </div>
         <div id="messages">
@@ -72,3 +74,4 @@
         </div>
     </body>
 </html>
+{% endlanguage %}
