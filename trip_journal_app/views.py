@@ -127,16 +127,20 @@ def show_story_near_by_page(request):
     """
     Search stories near by page
     """
-    return render(
-        request, 'items_near_by.html', {'item_type': 'stories'})
+    args={}
+    args.update(csrf(request))
+    args['item_type']='story'
+    return render(request, "items_near_by.html", args)
 
 
 def show_picture_near_by_page(request):
     """
     Search pictures near by page
     """
-    return render(
-        request, 'items_near_by.html', {'item_type': 'pictures'})
+    args={}
+    args.update(csrf(request))
+    args['item_type']='picture'
+    return render(request, "items_near_by.html", args)
 
 
 def my_news(request):

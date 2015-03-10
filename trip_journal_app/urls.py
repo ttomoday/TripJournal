@@ -23,8 +23,7 @@ urlpatterns = [
     # list of nearby stories
     url(r'^stories_near_by/$', views.show_story_near_by_page,
         name='stories_near_by'),
-    url(r'^search_items_near_by/', views.search_items_near_by,
-        name='search_items_near_by'),
+    
     url(r'^$', views.home, name='home'),
     # a link to a profile
     url(r'^my_news/$', views.my_news, name='my_news'),
