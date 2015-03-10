@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-10 15:35+0200\n"
+"POT-Creation-Date: 2015-03-10 15:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -107,24 +107,18 @@ msgid "Here you can find  pictures near  you"
 msgstr "Тут ви зможете знайти фотографії навколо вас "
 
 #: trip_journal_app/templates/items_near_by.html:34
-#, fuzzy
-#| msgid "Enter Latitude"
 msgid "Enter place"
-msgstr "Введіть широту"
+msgstr "Введіть місце"
 
 #: trip_journal_app/templates/items_near_by.html:36
-#, fuzzy
-#| msgid "Your stories"
 msgid "Search stories"
-msgstr "Moї історії"
+msgstr "Шукати історії"
 
 #: trip_journal_app/templates/items_near_by.html:38
-#, fuzzy
-#| msgid "Your stories"
 msgid "Search pictures"
-msgstr "Moї історії"
+msgstr "Шукати фотографії"
 
-#: trip_journal_app/templates/my_news.html:10
+#: trip_journal_app/templates/my_news.html:11
 msgid "Latest publications of my subscriptions"
 msgstr "Останні новини"
 
