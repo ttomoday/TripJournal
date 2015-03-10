@@ -33,8 +33,7 @@ urlpatterns = [
     # toggling publish state for story
     url(r'^publish/(?P<story_id>\d+)$', views.publish, name='publish'),
     url(r'^delete/(?P<story_id>\d+)$', views.delete, name='delete'),
-    url(r'^pagination/', views.make_paging_for_items_search,
-        name='make_paging_for_items_search'),
+    
     # get all tags
     url(r'^get_story_tags/$', views.get_story_tags, name='get_tag'),
     # put teg to DB
@@ -47,6 +46,8 @@ urlpatterns = [
         name='show_authorization_page'),
     # check connection with server
     url(r'^check_connection', views.check_connection, name='check_connection'),
+    url(r'^get_story_list/$', views.get_story_list, name='get_story_list'),
+    url(r'^get_picture_list/$', views.get_picture_list, name='get_picture_list'),
     url(r'^settings/$', views.settings ,name='settings'),
     url(r'^logout/$', views.logout , name='logout'),
     # subscribe on author

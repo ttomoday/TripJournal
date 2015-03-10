@@ -113,6 +113,32 @@ class Story(models.Model):
         return next((block for block in self.get_text_with_pic_objects()
                      if block['type'] == 'img'), None)
 
+    def get_coordinates(self):
+        return next((block for block in self.get_text_with_pic_objects()
+                     if block['marker'] != None), None)
+
+    def convert_to_dict(self):
+        '''
+        Create  dictionary of story for page  items_near_by 
+        '''
+        story_dict ={}
+        if self.get_coordinates():
+            story_dict["coordinates"]=self.get_coordinates()[u"marker"]
+        if self.first_img():
+            picture_id=self.first_img()[u'id']
+            picture_url=Picture.objects.get(pk=int(picture_id)).get_stored_pic_by_size(400)
+            story_dict["picture"]=unicode(picture_url)
+        if self.first_text():
+            story_dict["text"]=unicode(self.first_text()[u'content'])
+        if self.title:
+            story_dict["title"]=unicode(self.title)
+        story_dict["datetime"]=unicode(self.date_publish)
+        story_dict["user"]=unicode(self.user)
+        story_dict["id"]=int(self.id)
+        return story_dict
+
+
+
 
 class Picture(models.Model):
     latitude = models.FloatField(blank=True, null=True)
@@ -192,6 +218,20 @@ class Picture(models.Model):
                'ORDER BY distance;' % (latitude, longitude))
         list_of_pictures = list(Picture.objects.raw(req))
         return list_of_pictures
+
+    def convert_to_dict(self):
+        '''
+        Convert to dictionary for page  items_near_by 
+        '''
+        picture_dict ={}
+        if(self.latitude):
+            picture_dict[u"latitude"]=self.latitude
+        if(self.longitude):
+            picture_dict[u"longitude"]=self.longitude
+        picture_dict[u"picture_url"]=unicode(self.get_stored_pic_by_size(400))
+        picture_dict[u"id"]=int(self.id)
+        picture_dict[u"story_id"]=int(self.story_id)
+        return picture_dict
 
 
 class Stored_picture(models.Model):

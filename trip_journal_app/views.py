@@ -162,50 +162,73 @@ def my_news(request):
 
 
 def search_items_near_by(request):
-    if request.method == 'GET':
-        x = float(request.GET.get('latitude', ''))
-        y = float(request.GET.get('longitude', ''))
-        sess = SessionStore()
-        if request.GET.get('item_type', '') == u'pictures':
-            sess['items_list'] = {'item_type': 'pictures',
-                                  'items': Picture.get_sorted_picture_list(x, y)}
-            sess.save()
-        elif request.GET.get('item_type', '') == u'stories':
-            sess['items_list'] = {'item_type': 'stories',
-                                  'items': Story.get_sorted_stories_list(x, y)}
-            sess.save()
-        response = redirect('/pagination/')
-        response.set_cookie('pagination', sess.session_key)
-        return response
+    args={}
+    args.update(csrf(request))
+    return render(request, "items_near_by.html", args)
 
+def get_story_list(request):
+    if request.is_ajax():
+        """
+        Get coordinates of map.
+        """
+        request_body = json.loads(request.body)
+        coordinates=request_body["coordinates"]
+        left_border=float(coordinates['va']['k'])
+        right_border=float(coordinates['va']['j'])
+        bottom_border=float(coordinates['Ca']['k'])
+        top_border=float(coordinates['Ca']['j']) 
+        """
+        Filter story.
+        """  
+        story_list=[]
+        stories = Story.objects.filter(published=True)
+        for story in stories:
+            if story.get_coordinates():
+                story_lng=float(story.get_coordinates()[u"marker"][u"lng"])
+                story_lat=float(story.get_coordinates()[u"marker"][u"lat"])
+                if (story_lng>right_border) and (story_lng<left_border):
+                    if (story_lat<top_border) and (story_lat>bottom_border):                       
+                        """
+                        Append dictionary of story into story_list.
+                        """ 
+                        story_list.append(story.convert_to_dict())                  
+        """
+        Response story_list converted into JSON.
+        """    
+        JSON_story_list=json.dumps(story_list, ensure_ascii=False)
+    return HttpResponse(JSON_story_list)
 
-def make_paging_for_items_search(request):
-    sess_key = request.COOKIES['pagination']
-    sess = SessionStore(session_key=sess_key)
-    list_of_items = sess['items_list']
-    if list_of_items['item_type'] == 'pictures':
-        if not list_of_items['items']:
-            messages.info(request, 'No items found')
-            return redirect('/pictures_near_by/')
-        else:
-            paginator = Paginator(list_of_items['items'], 10)
-    elif list_of_items['item_type'] == 'stories':
-        if not list_of_items['items']:
-            messages.info(request, 'No items found')
-            return redirect('/stories_near_by/')
-        else:
-            paginator = Paginator(list_of_items['items'], 2)
-    page = request.GET.get('page')
-    try:
-        items = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        items = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        items = paginator.page(paginator.num_pages)
-    return render(request, 'items_near_by.html', {'items_list': items,
-                                                  'item_type': list_of_items['item_type']})
+def get_picture_list(request):
+    if request.is_ajax():
+        """
+        Get coordinates of map.
+        """
+        request_body = json.loads(request.body)
+        coordinates=request_body["coordinates"]
+        left_border=float(coordinates['va']['k'])
+        right_border=float(coordinates['va']['j'])
+        bottom_border=float(coordinates['Ca']['k'])
+        top_border=float(coordinates['Ca']['j'])
+        """
+        Filter picture.
+        """  
+        picture_list=[]
+        pictures=Picture.objects.all()
+        for picture in pictures:
+            story=Story.objects.get(id=picture.story_id)
+            if story.published:               
+                if picture.latitude and picture.longitude:
+                    if (picture.longitude>right_border) and (picture.longitude<left_border):
+                        if (picture.latitude<top_border) and (picture.latitude>bottom_border):               
+                            """
+                            Append dictionary of picture into picture_list.
+                            """ 
+                            picture_list.append(picture.convert_to_dict())
+        """
+        Response story_list converted into JSON.
+        """            
+        JSON_picture_list=json.dumps(picture_list, ensure_ascii=False)
+    return HttpResponse(JSON_picture_list)
 
 
 @login_required
@@ -379,3 +402,5 @@ def general_rss(request):
     context = {'stories': stories, 'date': date}
     return render(request, 'rss.xml', context,
                   content_type="application/xhtml+xml")
+
+
