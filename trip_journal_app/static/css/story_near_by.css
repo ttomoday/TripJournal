@@ -1,0 +1,169 @@
+html{
+   background:#fff;
+   min-height:100%;
+}   
+
+body{
+    height:100%;
+    position:relative;
+}
+#here{
+    height:30px;
+    margin-left:30px;
+    font-size:28px;
+    color:black;
+    position: relative;
+    padding-top: 20px;
+    padding-bottom:15px;
+}
+#here span{
+    color:#31797d;
+}
+
+#content{
+    width:1200px;
+    height:100%;
+    background:#444;
+    position:relative;   
+}
+
+#content_story_near_by{
+    position:relative;
+    float:left;   
+    height:100%;
+    width:1200px;
+}
+#story_container{
+    position:relative;
+    float:left;
+    width:570px;
+    height:600px;   
+    overflow-y: scroll;
+    overflow-x: hidden;   
+}
+#hide_scroll{
+    position:relative;
+    float:left;
+    width:550px;
+    height:600px;
+    margin-top:10px;
+    margin-left:30px;
+    overflow:hidden;
+    border:1px solid #eee;
+    border-top:1px solid #31797d;
+}
+
+.story_image{
+    width:100%;
+}
+.img_wrapper{
+    position:relative;
+    float:left;
+    width:150px;
+    height:100px;
+    overflow:hidden;
+    background:#411;
+}
+p.story_title{
+    font-size:15px;
+    color:#ae3c3c;
+    text-align: center;
+    margin-bottom:-10px;
+}
+p.story_text{
+    padding-left:10px;
+    padding-right:10px;
+    height:50px;
+}
+p.story_user_data{
+    position:absolute;
+    bottom:10px;
+    left:10px;
+    margin:0;
+    padding-top:5px;
+    width:130px;
+    border-top:1px solid #ccc;
+}
+.story_data{
+    color:#31797d;
+    float:right;
+}
+#google_api{
+    margin-top:10px;
+    float:right;
+
+    width:570px;
+    height:600px;
+    
+}
+
+#map_canvas{     
+    width:570px;
+    height:575px;
+}
+
+a.story{
+    color:black;
+    font-size:12px;
+    position:relative;
+    float:left;
+    border:1px solid #ddd;
+    width:150px;
+    height:190px;
+    margin-top:10px;
+    margin-left: 25px;
+    text-decoration: none;
+    background:#fff;
+    
+}
+a.story:hover , a.picture_wrap :hover{
+    -webkit-box-shadow: 0px 0px 5px 2px rgba(97,199,145,0.75);
+    -moz-box-shadow: 0px 0px 5px 2px rgba(97,199,145,0.75);
+    box-shadow: 0px 0px 5px 2px rgba(97,199,145,0.75);
+    opacity:1;
+
+}
+#address{
+    width:333px;
+    height:20px;
+    padding-left:20px;
+    border:1px solid #31797d;
+    margin:0;
+}
+#findAddres{
+    width:213px;
+    background:#31797d;
+    color:#fff;
+    border:0;
+    height:24px;
+    margin-left:-3px;
+    padding:0px;
+}
+#findAddres:hover{
+    background:#42999f;
+}
+
+.picture{
+    position:relative;
+    float:left;
+    width:250px;
+    height:200px;
+    margin-top:5px;
+    margin-left: 15px;
+}
+
+a.picture_wrap{
+    position:absolute;
+    bottom:0;
+    left:0;
+    margin:0;
+    padding:0;
+    border:0;
+
+}
+img{
+    border:0;
+    margin:0;
+    padding:0;
+
+}

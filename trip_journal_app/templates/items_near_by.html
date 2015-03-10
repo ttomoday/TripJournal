@@ -1,66 +1,40 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load staticfiles %}
-{% load trip_journal_extras %}
 {% block title %}{{ item_type }} near the place{% endblock %}
 {% block css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static "css/index.css" %}">
+<link rel="stylesheet" href="{% static "css/story_near_by.css" %}">
+{% endblock %}
+{% block scripts %}
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=false&libraries=drawing"></script>
+<script type="text/javascript" src="{% static "javascript/story_near_by.js" %}"></script>
+<script type="text/javascript" src="{% static "javascript/mapping.js" %}"></script>
+
 {% endblock %}
 
 {% block content %}
-    {% if item_type == 'stories' %}
-        <h3>{% trans "Here you can search stories near the place" %}</h3>
-    {% else %}
-        <h3>{% trans "Here you can search pictures near the place" %}</h3>
-    {% endif %}
-    <form action="/search_items_near_by/" method="get">
-        {% trans "Enter Latitude" %}: <br>
-        <input type="text" name="latitude" id="latitude" required><br>
-        {% trans "Enter Longitude" %}:<br>
-        <input type="text" name="longitude" id="longitude" required>
-        <input type="hidden" name="item_type" value="{{ item_type }}">
-        <input type="submit" value='{% trans "Search" %}'>
-    </form>
-    {% if items_list %}
-        {% if item_type == 'stories' %}
-            {% for item in items_list %}
-                    <div class="story_list_container">
-                        {% if item.story.first_img %}
-                        <div class="story_img_container">
-                            <img src="{{ item.story.first_img.pic|get_stored_pic_by_size:400 }}">
-                        </div>
-                        {% endif %}
-                        <div class="story_name_container">
-                            <a href="{% url "story" item.story.id %}">{{ item.story.title }}</a>
-                        </div>
-                        <div class="story_username_container">{{ item.story.user }}</div>
-                        <div class="story_datepublish_container">{{ item.story.date_publish|date }}</div>
-                    </div>
-            {% endfor %}   
-        {% elif item_type == 'pictures' %}
-            {% for item in items_list %}
-                    <div style="width:450px; display: inline-block">
-                        <img src="{{ item|get_stored_pic_by_size:400 }}">
-                    </div>
-            {% endfor %}
-        {% endif %}
+<div id="content_story_near_by">
 
-        <div align="center">
-        <span>
-            {% if items_list.has_previous %}
-                <a href="/pagination/?page={{ items_list.previous_page_number }}">Prev</a>
-            {% endif %}
-
-            <span>
-                {{ items_list.number }} of {{ items_list.paginator.num_pages }}
-            </span>
-
-            {% if items_list.has_next %}
-                <a href="/pagination/?page={{ items_list.next_page_number }}">Next</a>
-            {% endif %}
-        </span>
+    <div id="here">
+        {% trans "Here you can find  the closest stories to  you"%} <span> {% trans "or any place "%}</span>
+    </div>
+    <div id="hide_scroll">
+        <div id="story_container">     
         </div>
-    {% endif %}
+    </div>
+   
+    <div id='google_api'>       
+        <div id="panel">
+            {% csrf_token %}
+           
+            <input id="address" type="text" value='' placeholder=' {% trans "Enter place" %}' autocomplete='off'>
+            <input type="button" id="findAddres" value=' {% trans "Search stories" %}'>
+        </div>
+        <div id="map_canvas">
+        </div>
+    </div>
+</div> 
 
 {% endblock %}
