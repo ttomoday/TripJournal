@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-28 13:47+0200\n"
+"POT-Creation-Date: 2015-03-10 07:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,16 +35,19 @@ msgstr "настройки"
 msgid "my stories"
 msgstr "мої історії"
 
-#: trip_journal_app/templates/base.html:32
+#: trip_journal_app/templates/base.html:31
+msgid "my news"
+msgstr ""
+
+#: trip_journal_app/templates/base.html:33
 msgid "logout"
 msgstr "вийти"
 
-#: trip_journal_app/templates/base.html:36
+#: trip_journal_app/templates/base.html:37
 msgid "sign in"
 msgstr "ввійти"
 
 #: trip_journal_app/templates/edit.html:27
-#: trip_journal_app/templates/items_near_by.html:23
 msgid "Search"
 msgstr "Знайти"
 
@@ -61,24 +64,24 @@ msgstr "Теги"
 msgid "Text to story"
 msgstr "текст історії"
 
-#: trip_journal_app/templates/edit.html:84
+#: trip_journal_app/templates/edit.html:83
 msgid "Add artifact"
 msgstr "артефакт історії"
 
-#: trip_journal_app/templates/edit.html:93
+#: trip_journal_app/templates/edit.html:92
 msgid "text"
 msgstr "текст"
 
-#: trip_journal_app/templates/edit.html:96
+#: trip_journal_app/templates/edit.html:95
 msgid "image"
 msgstr "картинка"
 
-#: trip_journal_app/templates/edit.html:99
+#: trip_journal_app/templates/edit.html:98
 msgid "artifact"
 msgstr "артефакт"
 
-#: trip_journal_app/templates/edit.html:107
-#: trip_journal_app/templates/edit.html:113
+#: trip_journal_app/templates/edit.html:106
+#: trip_journal_app/templates/edit.html:112
 msgid "view"
 msgstr "Переглянути"
 
@@ -90,21 +93,27 @@ msgstr "Вітаємо в TripJournal"
 msgid "Take first step to your journey of a thousand miles"
 msgstr "Зроби перший крок назустріч подорожі в тисячу миль"
 
-#: trip_journal_app/templates/items_near_by.html:13
-msgid "Here you can search stories near the place"
+#: trip_journal_app/templates/items_near_by.html:21
+#, fuzzy
+#| msgid "Here you can search stories near the place"
+msgid "Here you can find  the closest stories to  you"
 msgstr "Тут ви зможете переглянути історії поблизу"
 
-#: trip_journal_app/templates/items_near_by.html:15
-msgid "Here you can search pictures near the place"
-msgstr "Тут ви зможете переглянути картинки поблизу"
+#: trip_journal_app/templates/items_near_by.html:21
+msgid "or any place "
+msgstr ""
 
-#: trip_journal_app/templates/items_near_by.html:18
-msgid "Enter Latitude"
+#: trip_journal_app/templates/items_near_by.html:32
+#, fuzzy
+#| msgid "Enter Latitude"
+msgid "Enter place"
 msgstr "Введіть широту"
 
-#: trip_journal_app/templates/items_near_by.html:20
-msgid "Enter Longitude"
-msgstr "Введіть довготу"
+#: trip_journal_app/templates/items_near_by.html:33
+#, fuzzy
+#| msgid "Your stories"
+msgid "Search stories"
+msgstr "Moї історії"
 
 #: trip_journal_app/templates/my_stories.html:11
 msgid "Your stories"
@@ -144,11 +153,11 @@ msgstr "з"
 msgid "Next"
 msgstr "Наступні"
 
-#: trip_journal_app/templates/story.html:27
+#: trip_journal_app/templates/story.html:26
 msgid "by"
 msgstr "створена"
 
-#: trip_journal_app/templates/story.html:41
+#: trip_journal_app/templates/story.html:47
 msgid "Edit this story"
 msgstr "Редагувати історію"
 
@@ -163,3 +172,12 @@ msgstr "Скасувати публікацію"
 #: trip_journal_app/templates/toggle_publish_buttons.html:8
 msgid "publish"
 msgstr "Опублікувати"
+
+#~ msgid "Here you can search stories near the place"
+#~ msgstr "Тут ви зможете переглянути історії поблизу"
+
+#~ msgid "Here you can search pictures near the place"
+#~ msgstr "Тут ви зможете переглянути картинки поблизу"
+
+#~ msgid "Enter Longitude"
+#~ msgstr "Введіть довготу"
