@@ -16,31 +16,3 @@ def change_language(request):
         request.session[translation.LANGUAGE_SESSION_KEY] = lan
     return redirect('/settings/')
 
-    
-def change_language_social(request, url_redirect):
-    user=request.user
-    profile=user.profile
-    if profile.user_language:
-        lang=profile.user_language            
-    else:
-        lang=request.LANGUAGE_CODE
-        profile.user_language=lang
-        profile.save()
-    activate(lang)
-    request.session[translation.LANGUAGE_SESSION_KEY] = lang
-    return redirect(url_redirect)
-    
-
-def change_language_social_index(request):
-    user=request.user
-    profile=user.profile
-    if profile.user_language:
-        lang=profile.user_language            
-    else:
-        lang=request.LANGUAGE_CODE
-        profile.user_language=lang
-        profile.save()
-    activate(lang)
-    request.session[translation.LANGUAGE_SESSION_KEY] = lang
-    return redirect('/')
-   
