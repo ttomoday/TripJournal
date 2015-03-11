@@ -96,6 +96,7 @@ def upload_img(request, story_id):
 
 
 def story(request, story_id):
+    try_activate_user_language(request)
     if story_id:
         return story_contents(request, story_id, 'story.html',
                               check_published=True)
