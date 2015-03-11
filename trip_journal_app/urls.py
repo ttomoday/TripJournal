@@ -23,7 +23,6 @@ urlpatterns = [
     # list of nearby stories
     url(r'^stories_near_by/$', views.show_story_near_by_page,
         name='stories_near_by'),
-    
     url(r'^$', views.home, name='home'),
     # a link to a profile
     url(r'^my_news/$', views.my_news, name='my_news'),
@@ -31,8 +30,7 @@ urlpatterns = [
     url(r'^stories_by_user/$', views.stories_by_user, name='stories_by_user'),
     # toggling publish state for story
     url(r'^publish/(?P<story_id>\d+)$', views.publish, name='publish'),
-    url(r'^delete/(?P<story_id>\d+)$', views.delete, name='delete'),
-    
+    url(r'^delete/(?P<story_id>\d+)$', views.delete, name='delete'),    
     # get all tags
     url(r'^get_story_tags/$', views.get_story_tags, name='get_tag'),
     # put teg to DB

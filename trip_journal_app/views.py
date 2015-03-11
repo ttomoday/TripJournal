@@ -1,6 +1,5 @@
 import json
 import datetime
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -20,13 +19,14 @@ from django.utils.translation import get_language_info
 from django.utils.translation import activate
 from django.utils import translation
 from django.conf import settings as TripJournal_settings
-
+from localization.views import try_activate_user_language
 
 
 def home(request):
     """
     Home page view.
     """
+    try_activate_user_language(request)
     stories = Story.objects.filter(published=True)
     context = {'stories': stories, 'user': auth.get_user(request)}
     return render(request, 'index.html', context)
@@ -127,6 +127,7 @@ def show_story_near_by_page(request):
     """
     Search stories near by page
     """
+    try_activate_user_language(request)
     args={}
     args.update(csrf(request))
     args['item_type']='story'
@@ -137,6 +138,7 @@ def show_picture_near_by_page(request):
     """
     Search pictures near by page
     """
+    try_activate_user_language(request)
     args={}
     args.update(csrf(request))
     args['item_type']='picture'
@@ -163,12 +165,6 @@ def my_news(request):
 
     context = {'stories': stories, 'exception': exception}
     return render(request, 'my_news.html', context)
-
-
-def search_items_near_by(request):
-    args={}
-    args.update(csrf(request))
-    return render(request, "items_near_by.html", args)
 
 def get_story_list(request):
     if request.is_ajax():
@@ -359,6 +355,7 @@ def check_connection(request):
 
 
 def settings(request):
+    try_activate_user_language(request)
     args={}
     args.update(csrf(request))
     if request.user.is_authenticated():    
