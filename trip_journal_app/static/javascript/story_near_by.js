@@ -80,7 +80,7 @@ var Content=(function(){
                      }                              
                 }
             }
-            // send coordinates od map
+            // send coordinates of map
             request_body =JSON.stringify({coordinates:map.getBounds()});
             xhr.send(request_body);
         }
@@ -91,7 +91,7 @@ var Content=(function(){
         googleAPI.deleteAllMarkers()
     }
 
-    // creates content of stories
+    // creates content of stories from JSON
     function createStories(json){
         var story_container=gId('story_container'),
         content=createElem('div'),
@@ -106,7 +106,7 @@ var Content=(function(){
         story_container.appendChild(content)
     }
 
-    // creates content of pictures
+    // creates content of pictures from JSON 
     function createPictures(json){
         var picture_container=gId('story_container'),
         content=createElem('div'),
@@ -282,7 +282,7 @@ var googleAPI=(function(){
         };
         map = new google.maps.Map(gId('map_canvas'), mapOptions);  
 
-        // Set centers map on current position or L'viv city center.
+        // Set centers map on current users position if brauser support geolocation or L'viv city center.
         navigator.geolocation.getCurrentPosition(
             function(position){                
                 var currentPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -298,6 +298,7 @@ var googleAPI=(function(){
             },{}) 
     }
 
+    // search place on google map
     function codeAddress() {
         var address = gId('address').value;
         if (address==""){
