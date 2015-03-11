@@ -212,14 +212,20 @@ function getStoryTags() {
                 var str = xhr.responseText;
                 var tags = JSON.parse(str);
                 var localStorageTags = getLocalStorageTags();
+
                 if (localStorageTags != null && localStorageTags.length > 0) {
-                    var localStorageTagsDate = new Date(localStorageTags[localStorageTags.length - 1].datetime);
-                    var serverTagsDate = new Date(tags[tags.length - 1].datetime);
-                    if (localStorageTagsDate > serverTagsDate) {
+                    if (tags.length > 0) {
+                        var localStorageTagsDate = new Date(localStorageTags[localStorageTags.length - 1].datetime);
+                        var serverTagsDate = new Date(tags[tags.length - 1].datetime);
+                        if (localStorageTagsDate > serverTagsDate) {
+                            tags_view(localStorageTags);
+                            putTag(localStorageTags[localStorageTags.length - 1].tag_name);
+                        } else {
+                            tags_view(tags);
+                        }
+                    } else {
                         tags_view(localStorageTags);
                         putTag(localStorageTags[localStorageTags.length - 1].tag_name);
-                    } else {
-                        tags_view(tags);
                     }
                 } else {
                     tags_view(tags);

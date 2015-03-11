@@ -27,6 +27,8 @@ window.onload = function() {
     for (var i = 0; i < clearBlocks.length; i++) {
         clearBlocks[i].addEventListener("click", clear);
     }
+
+    toDo();
 }
 
 
@@ -650,5 +652,6 @@ function toDo() {
     console.log(" ");
     console.log("TODO LIST");
     console.log(" 1. Merge all changes");
+    console.log(" 2. Delete this list");
     console.log(" ");
 }
