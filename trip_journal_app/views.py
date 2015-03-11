@@ -284,16 +284,20 @@ def put_tag(request):
     """
     if request.is_ajax():
         request_body = json.loads(request.body)
-        tags = Tag.objects.filter(name=request_body['tag_name'])
-        if not tags:
-            tag = Tag()
-            tag.name = request_body['tag_name']
-            tag.save()
-        else:
-            tag = tags[0]
-        story = Story.objects.get(pk=int(request_body['story_id']))
-        story.tags.add(tag)
-        story.save()
+
+        for tag_from_request in request_body:
+            tags = Tag.objects.filter(name=tag_from_request['tag_name'])
+            if not tags:
+                tag = Tag()
+                tag.name = tag_from_request['tag_name']
+                tag.save()
+            else:
+                tag = tags[0]
+                tag.datetime = datetime.datetime.now()
+                tag.save()
+            story = Story.objects.get(pk=int(tag_from_request['story_id']))
+            story.tags.add(tag)
+            story.save()
         return HttpResponse(status=200)
 
 

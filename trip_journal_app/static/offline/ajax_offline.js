@@ -7,7 +7,7 @@ function getStoryTags() {
 
 function tags_view(tags_arr) {
     // var actual_data = check_actual_tags(tags_arr);
-    var actual_data = tags_arr;
+    var actual_data = tags_arr[0];
 
     button_list.innerHTML = '';
 
@@ -34,12 +34,27 @@ function putTag(tag_name) {
 }
 
 function jsonTagStory(tag_name) {
+    var blocks = [];
     var datetime = new Date();
+    datetime.setMinutes(datetime.getMinutes() - 1);
+
+    var tags_block = gId("tags_list").children[0];
+    var tags_list = tags_block.childNodes;
+    for (var i = 0; i < tags_list.length; i++) {
+        var existing_tag_name = tags_list[i].childNodes[0].data;
+        var block = {};
+        block.story_id = storyIdFromUrl();
+        block.tag_name = existing_tag_name;
+        block.datetime = datetime;
+        blocks.push(block);
+    };
+
     var block = {};
     block.story_id = storyIdFromUrl();
     block.tag_name = tag_name;
     block.datetime = datetime;
-    return block;
+    blocks.push(block);
+    return blocks;
 }
 
 function deleteStoryTags(i) {
