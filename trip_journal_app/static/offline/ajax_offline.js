@@ -23,10 +23,8 @@ function putTag(tag_name) {
 
     if (supportsLocalStorage()) {
         // add data to localStorage
-
         var tagStory = jsonTagStory(tag_name);
-        console.log(tagStory[tagStory.length-1]);
-        addToLocalStorrage("Tag", JSON.stringify(tagStory[tagStory.length-1]));
+        addToLocalStorrage("Tag", JSON.stringify(tagStory[tagStory.length - 1]));
 
         tag_input.value = '';
         getStoryTags();
@@ -37,7 +35,7 @@ function putTag(tag_name) {
 function jsonTagStory(tag_name) {
     var blocks = [];
     var datetime = new Date();
-    datetime.setMinutes(datetime.getMinutes() - 1);
+    datetime.setSeconds(datetime.getSeconds() - 15);
 
     var tags_block = gId("tags_list").children[0];
     var tags_list = tags_block.childNodes;
@@ -83,6 +81,7 @@ function postData(async) {
 function storyBlocksJson() {
     var blocks = [];
     var datetime = new Date();
+    datetime.setSeconds(datetime.getSeconds()-15)
 
     story_title = document.getElementById("story_title")
     if (story_title.childNodes[0]) {

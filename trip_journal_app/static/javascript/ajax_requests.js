@@ -28,7 +28,7 @@ function getMarkerLocation(index) {
 function storyBlocksJson() {
     var blocks = [];
     var datetime = new Date();
-    datetime.setMinutes(datetime.getMinutes() - 1);
+    datetime.setSeconds(datetime.getSeconds() - 15);
 
     story_title = document.getElementById("story_title")
     if (story_title.childNodes[0]) {
@@ -158,7 +158,7 @@ function savePage() {
 function jsonTagStory(tag_name) {
     var blocks = [];
     var datetime = new Date();
-    datetime.setMinutes(datetime.getMinutes() - 1);
+    datetime.setSeconds(datetime.getSeconds() - 15);
 
     var tags_block = gId("tags_list").children[0];
     var tags_list = tags_block.childNodes;
@@ -197,8 +197,7 @@ function putTag(tag_name) {
 
     if (supportsLocalStorage()) {
         var tagStory = jsonTagStory(tag_name);
-        console.log(tagStory[tagStory.length-1]);
-        addToLocalStorrage("Tag", JSON.stringify(tagStory[tagStory.length-1]));
+        addToLocalStorrage("Tag", JSON.stringify(tagStory[tagStory.length - 1]));
     };
 
     xhr.send(request_body);
@@ -211,7 +210,20 @@ function getStoryTags() {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var str = xhr.responseText;
-                tags_view(JSON.parse(str));
+                var tags = JSON.parse(str);
+                var localStorageTags = getLocalStorageTags();
+                if (localStorageTags != null && localStorageTags.length > 0) {
+                    var localStorageTagsDate = new Date(localStorageTags[localStorageTags.length - 1].datetime);
+                    var serverTagsDate = new Date(tags[tags.length - 1].datetime);
+                    if (localStorageTagsDate > serverTagsDate) {
+                        tags_view(localStorageTags);
+                        putTag(localStorageTags[localStorageTags.length - 1].tag_name);
+                    } else {
+                        tags_view(tags);
+                    }
+                } else {
+                    tags_view(tags);
+                }
             }
         }
         params = 'Story_id=' + story_id;
@@ -219,6 +231,12 @@ function getStoryTags() {
         xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
         xhr.send();
     }
+}
+
+function getLocalStorageTags() {
+    var localStorage_tags = localStorage.getItem("Tag");
+    var tags_list = JSON.parse(localStorage_tags);
+    return tags_list;
 }
 
 function tags_view(tags_arr) {

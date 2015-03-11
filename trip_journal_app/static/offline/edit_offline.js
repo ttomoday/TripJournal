@@ -29,9 +29,6 @@ window.onload = function() {
     for (var i = 0; i < clearBlocks.length; i++) {
         clearBlocks[i].addEventListener("click", clear);
     }
-
-    // call function what I have to do.
-    toDo();
 }
 
 // Main menu in offline mode
@@ -589,13 +586,4 @@ function removeMarker(element) {
         Markers[index] = null;
         savePage();
     }
-}
-
-// List of things, that I have to do, when the file offline.manifest will be right configured.
-function toDo() {
-    console.log(" ");
-    console.log("TODO LIST");
-    console.log(" 1. In file ajax_requests, uncomment 'check_actual_tags' \
-         ");
-    console.log(" ");
 }

@@ -27,9 +27,6 @@ window.onload = function() {
     for (var i = 0; i < clearBlocks.length; i++) {
         clearBlocks[i].addEventListener("click", clear);
     }
-
-    // call function what I have to do.
-    toDo();
 }
 
 
@@ -652,7 +649,6 @@ function removeMarker(element) {
 function toDo() {
     console.log(" ");
     console.log("TODO LIST");
-    console.log(" 1. In file ajax_requests, uncomment 'check_actual_tags' \
-         ");
+    console.log(" 1. Merge all changes");
     console.log(" ");
 }
