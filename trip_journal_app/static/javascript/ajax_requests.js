@@ -163,7 +163,6 @@ function jsonTagStory(tag_name) {
     var tags_block = gId("tags_list").children[0];
     var tags_list = tags_block.childNodes;
     for (var i = 0; i < tags_list.length; i++) {
-        // console.log(tags_list[i].childNodes[0].data);
         var existing_tag_name = tags_list[i].childNodes[0].data;
         var block = {};
         block.story_id = storyIdFromUrl();
@@ -197,7 +196,9 @@ function putTag(tag_name) {
     request_body = JSON.stringify(jsonTagStory(tag_name));
 
     if (supportsLocalStorage()) {
-        addToLocalStorrage("Tag", request_body);
+        var tagStory = jsonTagStory(tag_name);
+        console.log(tagStory[tagStory.length-1]);
+        addToLocalStorrage("Tag", JSON.stringify(tagStory[tagStory.length-1]));
     };
 
     xhr.send(request_body);
@@ -220,33 +221,7 @@ function getStoryTags() {
     }
 }
 
-
-// comparing tags time on the server, and in the localStorage
-// and getting back array list, with actual data
-function check_actual_tags(server_data) {
-    var storage_data, server_date, storage_date;
-
-    // get localStorage Tag data
-    storage_data = JSON.parse(localStorage.getItem("Tag"));
-
-    // check anvailability Tag data in localStorage
-    if (storage_data) {
-        storage_date = new Date(storage_data[storage_data.length - 1].datetime);
-        server_date = new Date(server_data[server_data.length - 1].datetime);
-
-        // select data wiith newer datetime
-        if (storage_date > server_date) {
-            return storage_data;
-        } else {
-            return server_data;
-        }
-    } else {
-        return server_data;
-    }
-}
-
 function tags_view(tags_arr) {
-    // var actual_data = check_actual_tags(tags_arr);
     var actual_data = tags_arr;
 
     button_list.innerHTML = '';

@@ -6,8 +6,7 @@ function getStoryTags() {
 }
 
 function tags_view(tags_arr) {
-    // var actual_data = check_actual_tags(tags_arr);
-    var actual_data = tags_arr[0];
+    var actual_data = tags_arr;
 
     button_list.innerHTML = '';
 
@@ -24,8 +23,10 @@ function putTag(tag_name) {
 
     if (supportsLocalStorage()) {
         // add data to localStorage
-        request_body = JSON.stringify(jsonTagStory(tag_name));
-        addToLocalStorrage("Tag", request_body);
+
+        var tagStory = jsonTagStory(tag_name);
+        console.log(tagStory[tagStory.length-1]);
+        addToLocalStorrage("Tag", JSON.stringify(tagStory[tagStory.length-1]));
 
         tag_input.value = '';
         getStoryTags();
