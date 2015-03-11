@@ -43,10 +43,8 @@ urlpatterns = [
     url(r'^get_story_content/$', views.get_story_content, name='get_content'),
     url(r'^authorization_page/', views.show_authorization_page,
         name='show_authorization_page'),
-    # check connection with server
-    url(r'^check_connection', views.check_connection, name='check_connection'),
-    
-    url(r'^settings/$', views.settings ,name='settings'),
 
-    url(r'^logout/$', views.logout , name='logout'),
+    url(r'^settings/$', views.settings, name='settings'),
+
+    url(r'^logout/$', views.logout, name='logout'),
 ]

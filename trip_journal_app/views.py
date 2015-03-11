@@ -263,15 +263,12 @@ def get_story_content(request):
         pictures = Picture.objects.filter(story_id=int(story_id))
         picture_dic = {}
         for picture in pictures:
-            picture_dic[unicode(picture.id)] = unicode(picture.get_stored_pic_by_size(
-                800))
+            picture_dic[unicode(picture.id)] = unicode(
+                picture.get_stored_pic_by_size(800))
 
         content = {"text": unicode(story.text), "title": unicode(story.title),
                    "datetime": unicode(story.date_publish),
                    "picture": picture_dic}
-        print "=" * 50
-        print content
-        print "=" * 50
 
         return HttpResponse(json.dumps(content))
         # return HttpResponse(status=200)
@@ -316,10 +313,6 @@ def stories_by_user(request):
             stories = Story.objects.filter(user=needed_user)
         context = {'stories': stories}
         return render(request, 'stories_by_user.html', context)
-
-
-def check_connection(request):
-    return HttpResponse(status=200)
 
 
 def change_manifest():

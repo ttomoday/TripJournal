@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-28 13:47+0200\n"
+"POT-Creation-Date: 2015-03-10 11:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,42 +43,42 @@ msgstr "вийти"
 msgid "sign in"
 msgstr "ввійти"
 
-#: trip_journal_app/templates/edit.html:27
+#: trip_journal_app/templates/edit.html:24
 #: trip_journal_app/templates/items_near_by.html:23
 msgid "Search"
 msgstr "Знайти"
 
-#: trip_journal_app/templates/edit.html:37
-#: trip_journal_app/templates/edit.html:43
+#: trip_journal_app/templates/edit.html:34
+#: trip_journal_app/templates/edit.html:40
 msgid "Title of story"
 msgstr "Заголовок історії"
 
-#: trip_journal_app/templates/edit.html:52
+#: trip_journal_app/templates/edit.html:49
 msgid "Tags"
 msgstr "Теги"
 
-#: trip_journal_app/templates/edit.html:76
+#: trip_journal_app/templates/edit.html:73
 msgid "Text to story"
 msgstr "текст історії"
 
-#: trip_journal_app/templates/edit.html:84
+#: trip_journal_app/templates/edit.html:81
 msgid "Add artifact"
 msgstr "артефакт історії"
 
-#: trip_journal_app/templates/edit.html:93
+#: trip_journal_app/templates/edit.html:90
 msgid "text"
 msgstr "текст"
 
-#: trip_journal_app/templates/edit.html:96
+#: trip_journal_app/templates/edit.html:93
 msgid "image"
 msgstr "картинка"
 
-#: trip_journal_app/templates/edit.html:99
+#: trip_journal_app/templates/edit.html:96
 msgid "artifact"
 msgstr "артефакт"
 
-#: trip_journal_app/templates/edit.html:107
-#: trip_journal_app/templates/edit.html:113
+#: trip_journal_app/templates/edit.html:104
+#: trip_journal_app/templates/edit.html:110
 msgid "view"
 msgstr "Переглянути"
 
@@ -106,19 +106,19 @@ msgstr "Введіть широту"
 msgid "Enter Longitude"
 msgstr "Введіть довготу"
 
-#: trip_journal_app/templates/my_stories.html:11
+#: trip_journal_app/templates/my_stories.html:17
 msgid "Your stories"
 msgstr "Moї історії"
 
-#: trip_journal_app/templates/my_stories.html:12
+#: trip_journal_app/templates/my_stories.html:18
 msgid "Create new story"
 msgstr "Створити нову історію"
 
-#: trip_journal_app/templates/my_stories.html:36
+#: trip_journal_app/templates/my_stories.html:42
 msgid "edit"
 msgstr "редагувати"
 
-#: trip_journal_app/templates/my_stories.html:41
+#: trip_journal_app/templates/my_stories.html:47
 msgid "delete"
 msgstr "видалити"
 

@@ -5,6 +5,7 @@ window.onload = function() {
             //     window.location.reload();
             // }
             window.location.reload();
+            localStorage.clear();
         });
     }
 }

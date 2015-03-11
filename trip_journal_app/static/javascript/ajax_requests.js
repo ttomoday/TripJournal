@@ -8,23 +8,6 @@ if (typeof String.prototype.endsWith !== 'function') {
     };
 }
 
-// Check connection with server, and return condition.
-function checkServerConnection() {
-    // return false;
-    // return navigator.onLine;
-    var xhr = new XMLHttpRequest;
-    var condition = false;
-    xhr.open('GET', '/check_connection/', false);
-
-    xhr.onreadystatechange = function() {
-        if (xhr.status === 200) {
-            condition = true;
-        }
-    }
-    xhr.send();
-    return condition;
-}
-
 // get story Id
 function storyIdFromUrl() {
     var currUrl = document.URL.split(['/']);
@@ -126,46 +109,40 @@ function postImages(storyId) {
 
 
 function postData(async) {
-    if (checkServerConnection()) {
-        var xhr = new XMLHttpRequest(),
-            requestBody = JSON.stringify(storyBlocksJson());
-
-        // Add to localStorage
-        if (supportsLocalStorage()) {
-            addToLocalStorrage("Block_content", requestBody);
-        }
-
-        /**
-         * Appends story id to page url and urls form publsih panel
-         * and makes publish panel visble
-         * if request was sent from /edit/ page.
-         */
-        function addStoryIdToUrls() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var newId = xhr.responseText;
-                if (!document.URL.endsWith(newId)) {
-                    window.history.pushState(
-                        'new_id', 'Title', '/edit/' + newId
-                    );
-                    var publish_panel = document.getElementById('publish_panel');
-                    publish_panel.className = 'block';
-                    publish_panel.style.display = 'block';
-                    document.getElementById('publish_form').action = '/publish/' + newId;
-                    document.getElementById('view_form').action = '/story/' + newId;
-                }
-            }
-        }
-        xhr.onreadystatechange = addStoryIdToUrls;
-        xhr.open('POST', '/save/' + storyIdFromUrl(), async);
-        xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
-        xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
-        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-        xhr.send(requestBody);
-
-    } else {
+    var xhr = new XMLHttpRequest(),
         requestBody = JSON.stringify(storyBlocksJson());
+
+    // Add to localStorage
+    if (supportsLocalStorage()) {
         addToLocalStorrage("Block_content", requestBody);
     }
+
+    /**
+     * Appends story id to page url and urls form publsih panel
+     * and makes publish panel visble
+     * if request was sent from /edit/ page.
+     */
+    function addStoryIdToUrls() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var newId = xhr.responseText;
+            if (!document.URL.endsWith(newId)) {
+                window.history.pushState(
+                    'new_id', 'Title', '/edit/' + newId
+                );
+                var publish_panel = document.getElementById('publish_panel');
+                publish_panel.className = 'block';
+                publish_panel.style.display = 'block';
+                document.getElementById('publish_form').action = '/publish/' + newId;
+                document.getElementById('view_form').action = '/story/' + newId;
+            }
+        }
+    }
+    xhr.onreadystatechange = addStoryIdToUrls;
+    xhr.open('POST', '/save/' + storyIdFromUrl(), async);
+    xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+    xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xhr.send(requestBody);
 }
 
 
@@ -190,64 +167,41 @@ function jsonTagStory(tag_name) {
 
 function putTag(tag_name) {
     var tag_input = gId('tag_input')
-    if (checkServerConnection()) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/put_tag/', true);
-        xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
-        xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                tag_input.value = '';
-                getStoryTags();
-                savePage();
-            }
-        }
-
-        request_body = JSON.stringify(jsonTagStory(tag_name));
-
-        if (supportsLocalStorage()) {
-            addToLocalStorrage("Tag", request_body);
-        };
-
-        xhr.send(request_body);
-
-    } else {
-
-        if (supportsLocalStorage()) {
-            // add data to localStorage
-            request_body = JSON.stringify(jsonTagStory(tag_name));
-            addToLocalStorrage("Tag", request_body);
-
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/put_tag/', true);
+    xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+    xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
             tag_input.value = '';
             getStoryTags();
-        };
+            savePage();
+        }
     }
+
+    request_body = JSON.stringify(jsonTagStory(tag_name));
+
+    if (supportsLocalStorage()) {
+        addToLocalStorrage("Tag", request_body);
+    };
+
+    xhr.send(request_body);
 }
 
 function getStoryTags() {
-    if (checkServerConnection()) {
-        story_id = storyIdFromUrl();
-        if (story_id) {
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var str = xhr.responseText;
-                    tags_view(JSON.parse(str));
-                }
+    story_id = storyIdFromUrl();
+    if (story_id) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var str = xhr.responseText;
+                tags_view(JSON.parse(str));
             }
-            params = 'Story_id=' + story_id;
-            xhr.open('GET', '/get_story_tags/?' + params, true);
-            xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
-            xhr.send();
         }
-
-    } else {
-
-        var str = localStorage.getItem("Tag");
-        if (str) {
-            tags_view(JSON.parse(str));
-        };
-
+        params = 'Story_id=' + story_id;
+        xhr.open('GET', '/get_story_tags/?' + params, true);
+        xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
+        xhr.send();
     }
 }
 

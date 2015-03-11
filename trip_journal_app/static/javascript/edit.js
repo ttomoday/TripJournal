@@ -1,17 +1,10 @@
 var Images = []; //Array of pictures that will be uploaded.
 var Markers = []; //Array of markers, index of marker in this array is equal to the index of the block that it belongs. 
-var serverConnect = checkServerConnection();
 
 window.onload = function() {
     getStoryContent(); // get story content using AJAX
     getStoryTags(); // get story tegs using AJAX
-
-    // In online mode initialize the google map API. In offline show short menu
-    if (serverConnect) {
-        initialize(); // initialize the google map API
-    } else {
-        setMenu(); // Show in menu only editor element
-    }
+    initialize(); // initialize the google map API
 
     //EventListeners
     gId('add_title').addEventListener("click", addTitle); // add title of story
@@ -47,28 +40,38 @@ function gId(id) {
 
 // Get content from server
 function getStoryContent() {
-    if (serverConnect) {
-        story_id = storyIdFromUrl();
-        if (story_id) {
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var str = xhr.responseText;
-                    var content = JSON.parse(str);
+    var localStorage_content = getLocalStorageContent();
+    var story_id = storyIdFromUrl();
+    if (story_id) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var str = xhr.responseText;
+                var content = JSON.parse(str);
+
+                if (getLocalStorageContent()) {
+                    var server_datetime = new Date(content.datetime);
+                    var localStorage_datetime = new Date(localStorage_content.datetime)
+
+                    if (server_datetime < localStorage_datetime) {
+                        initialize_story(localStorage_content);
+                    } else {
+                        initialize_story(content);                        
+                    }
+
+                } else {
                     initialize_story(content);
                 }
+                // initialize_story(content);
             }
-            params = 'id=' + story_id;
-            xhr.open('GET', '/get_story_content/?' + params, false);
-            xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
-            xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-            xhr.send();
-        } else {
-            var localStorage_content = getLocalStorageContent()
-            initialize_story(localStorage_content);
         }
-    } else {
-        var localStorage_content = getLocalStorageContent()
+        params = 'id=' + story_id;
+        xhr.open('GET', '/get_story_content/?' + params, false);
+        xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send();
+
+    } else if (getLocalStorageContent()) {
         initialize_story(localStorage_content);
     }
 }
@@ -83,45 +86,29 @@ function getLocalStorageContent() {
 
 // Check type of block content, and call right function
 function initialize_story(content) {
-    var server_datetime = content.datetime;
-    var localStorage_content = getLocalStorageContent();
-    var localStorage_datetime = localStorage_content.datetime;
-
     if (content.title) {
         title_view(content.title);
     }
-    if (serverConnect) {
 
-        if (content.text) {
-            content_list = JSON.parse(content.text);
-            for (var i = 0; i < content_list.length; i++) {
-                var marker = content_list[i].marker
-                    // create text block
-                if (content_list[i].type === "text") {
-                    text_view(content_list[i].content, marker);
-                }
-                // create artifack block
-                if (content_list[i].type === "artifact") {
-                    artifact_view(content_list[i].content, marker);
-                }
-                // create image or gallery block
-                if (content_list[i].type === "img") {
-                    var galleryId = content_list[i].galleryId || [content_list[i].id];
-                    var imgs = content.picture;
-                    show_pictures(galleryId, imgs, marker);
-                }
+    if (content.text) {
+        content_list = JSON.parse(content.text);
+        for (var i = 0; i < content_list.length; i++) {
+            var marker = content_list[i].marker
+                // create text block
+            if (content_list[i].type === "text") {
+                text_view(content_list[i].content, marker);
             }
-        } else {
-            for (var i = 0; i < content.blocks.length; i++) {
-                if (content.blocks[i].type === "text") {
-                    text_view(content.blocks[i].content);
-                }
-                if (content.blocks[i].type === "artifact") {
-                    artifact_view(content.blocks[i].content);
-                }
-            };
+            // create artifack block
+            if (content_list[i].type === "artifact") {
+                artifact_view(content_list[i].content, marker);
+            }
+            // create image or gallery block
+            if (content_list[i].type === "img") {
+                var galleryId = content_list[i].galleryId || [content_list[i].id];
+                var imgs = content.picture;
+                show_pictures(galleryId, imgs, marker);
+            }
         }
-
     } else {
         for (var i = 0; i < content.blocks.length; i++) {
             if (content.blocks[i].type === "text") {
