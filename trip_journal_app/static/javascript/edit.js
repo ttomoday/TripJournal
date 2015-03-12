@@ -375,8 +375,9 @@ function save_photo_story() {
         oneImage.className = "image_story"
         oneImage.src = arr[0].src
         // put marker if image has GPS coordinates in Exif data
-        $('#type_file').fileExif(setMarkerFromImageExifData);
         appendBlock(oneImage, "img");
+        $('#type_file').fileExif(setMarkerFromImageExifData);
+        
     }
     clear();
 }
@@ -388,8 +389,8 @@ function setMarkerFromImageExifData(exifData){
         var lng=ConvertDMSToDD(exifData.GPSLongitude);                      
         var myLatlng = new google.maps.LatLng(lat, lng);
         var countBlock=document.getElementsByClassName("block_story").length-1
-        indexOfMarket=countBlock                     
-        placeMarker(myLatlng);
+        indexOfMarket=countBlock
+        setTimeout(function(){ placeMarker(myLatlng)}, 200)                     
         map.setCenter(myLatlng);      
     }
 }

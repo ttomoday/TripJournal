@@ -6,14 +6,22 @@
 	margin-left:-490px;
 	text-align: center;
 }
+table{
+	width:100%;
+}
+
+table td{
+	width:50%;
+}
 #select_language{
-	width:150px;
 	height:40px;
 	background-color: #31797d;
 	color:#fff;
 	border:2px solid #fff;
 	font-size:18px;
 	text-align: center;
+	padding-left: 30px;
+	padding-right:30px;
 	-webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
