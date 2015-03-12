@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="{% static "css/edit.css" %}">
     {% endblock %}
     {% block scripts %}
+        <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="7zi6cunqxdugf7t"></script>
         <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=false&libraries=drawing">
 </script>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
@@ -93,6 +94,9 @@
             </div>
             <div id="added_artifact" class="add_block">
                 <span class="block_title">{% trans "artifact" %}</span>
+            </div>
+            <div id="dropbox-container" class="">
+            
             </div>
 
         </div>
