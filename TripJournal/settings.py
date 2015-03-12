@@ -47,10 +47,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'debug_toolbar',
     'trip_journal_app',
     'social.apps.django_app.default',
     'localization',
+    # 'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -79,6 +79,7 @@ DATABASES = {
         'NAME': 'TripJournal',
         'USER': local_settings.db_user,
         'PASSWORD': local_settings.db_password,
+        
     }
 }
 

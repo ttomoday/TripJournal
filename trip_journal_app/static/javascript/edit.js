@@ -27,8 +27,6 @@ window.onload = function() {
     for (var i = 0; i < clearBlocks.length; i++) {
         clearBlocks[i].addEventListener("click", clear);
     }
-
-    toDo();
 }
 
 
@@ -376,9 +374,34 @@ function save_photo_story() {
         oneImage = document.createElement("img")
         oneImage.className = "image_story"
         oneImage.src = arr[0].src
+        // put marker if image has GPS coordinates in Exif data
+        $('#type_file').fileExif(setMarkerFromImageExifData);
         appendBlock(oneImage, "img");
     }
     clear();
+}
+
+// put marker if image has GPS coordinates in Exif data
+function setMarkerFromImageExifData(exifData){           
+    if(exifData.GPSLatitude && exifData.GPSLongitude){
+        var lat=ConvertDMSToDD(exifData.GPSLatitude);
+        var lng=ConvertDMSToDD(exifData.GPSLongitude);                      
+        var myLatlng = new google.maps.LatLng(lat, lng);
+        var countBlock=document.getElementsByClassName("block_story").length-1
+        indexOfMarket=countBlock                     
+        placeMarker(myLatlng);
+        map.setCenter(myLatlng);      
+    }
+}
+
+//convert from degrees, minutes, seconds to decimal degrees coordinates
+function ConvertDMSToDD(dms) {
+    var dmsArray=dms.toString().split(",");
+    var degrees=+dmsArray[0];
+    var minutes=+dmsArray[1];
+    var seconds=+dmsArray[2];
+    var dd = degrees + minutes/60 + seconds/(60*60);
+    return dd;   
 }
 
 //change image  on gallery click
@@ -645,13 +668,4 @@ function removeMarker(element) {
         Markers[index] = null;
         savePage();
     }
-}
-
-// List of things, that I have to do, when the file offline.manifest will be right configured.
-function toDo() {
-    console.log(" ");
-    console.log("TODO LIST");
-    console.log(" 1. Merge all changes");
-    console.log(" 2. Delete this list");
-    console.log(" ");
 }

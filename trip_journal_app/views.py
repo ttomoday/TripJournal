@@ -1,6 +1,5 @@
 import json
 import datetime
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -9,9 +8,10 @@ from django.shortcuts import render_to_response
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.backends.db import SessionStore
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
-from trip_journal_app.models import Story, Picture, Tag, Map_artifact
+from django.contrib.auth.models import User
+from trip_journal_app.models import Story, Picture, Tag, Map_artifact, Subscriptions
 from trip_journal_app.forms import UploadFileForm
 from trip_journal_app.utils.story_utils import story_contents
 from django.core.context_processors import csrf
@@ -132,8 +132,10 @@ def show_story_near_by_page(request):
     Search stories near by page
     """
     try_activate_user_language(request)
-    return render(
-        request, 'items_near_by.html', {'item_type': 'stories'})
+    args = {}
+    args.update(csrf(request))
+    args['item_type'] = 'story'
+    return render(request, "items_near_by.html", args)
 
 
 def show_picture_near_by_page(request):
@@ -141,57 +143,98 @@ def show_picture_near_by_page(request):
     Search pictures near by page
     """
     try_activate_user_language(request)
-    return render(
-        request, 'items_near_by.html', {'item_type': 'pictures'})
+    args = {}
+    args.update(csrf(request))
+    args['item_type'] = 'picture'
+    return render(request, "items_near_by.html", args)
 
 
-def search_items_near_by(request):
-    if request.method == 'GET':
-        x = float(request.GET.get('latitude', ''))
-        y = float(request.GET.get('longitude', ''))
-        sess = SessionStore()
-        if request.GET.get('item_type', '') == u'pictures':
-            sess['items_list'] = {'item_type': 'pictures',
-                                  'items': Picture.get_sorted_picture_list(x, y
-                                                                           )}
-            sess.save()
-        elif request.GET.get('item_type', '') == u'stories':
-            sess['items_list'] = {'item_type': 'stories',
-                                  'items': Story.get_sorted_stories_list(x, y)}
-            sess.save()
-        response = redirect('/pagination/')
-        response.set_cookie('pagination', sess.session_key)
-        return response
+def my_news(request):
+    """
+    Shows a page with latest publications of my subscriptions
+    """
+    user = auth.get_user(request)
+    user_subscriptions = Subscriptions.objects.filter(subscriber=user)
+    exception = None
+    stories = []
+
+    if user_subscriptions:
+        for subscription in user_subscriptions:
+            for story in Story.objects.filter(user=subscription.subscription):
+                stories.append(story)
+        if not stories:
+            exception = "No stories"
+    else:
+        exception = "You have no subscriptions"
+
+    context = {'stories': stories, 'exception': exception}
+    return render(request, 'my_news.html', context)
 
 
-def make_paging_for_items_search(request):
-    sess_key = request.COOKIES['pagination']
-    sess = SessionStore(session_key=sess_key)
-    list_of_items = sess['items_list']
-    if list_of_items['item_type'] == 'pictures':
-        if not list_of_items['items']:
-            messages.info(request, 'No items found')
-            return redirect('/pictures_near_by/')
-        else:
-            paginator = Paginator(list_of_items['items'], 10)
-    elif list_of_items['item_type'] == 'stories':
-        if not list_of_items['items']:
-            messages.info(request, 'No items found')
-            return redirect('/stories_near_by/')
-        else:
-            paginator = Paginator(list_of_items['items'], 2)
-    page = request.GET.get('page')
-    try:
-        items = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        items = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        items = paginator.page(paginator.num_pages)
-    return render(request, 'items_near_by.html', {'items_list': items,
-                                                  'item_type': list_of_items[
-                                                      'item_type']})
+def get_story_list(request):
+    if request.is_ajax():
+        """
+        Get coordinates of map.
+        """
+        request_body = json.loads(request.body)
+        coordinates = request_body["coordinates"]
+        left_border = float(coordinates['va']['k'])
+        right_border = float(coordinates['va']['j'])
+        bottom_border = float(coordinates['Ca']['k'])
+        top_border = float(coordinates['Ca']['j'])
+        """
+        Filter story.
+        """
+        story_list = []
+        stories = Story.objects.filter(published=True)
+        for story in stories:
+            if story.get_coordinates():
+                story_lng = float(story.get_coordinates()[u"marker"][u"lng"])
+                story_lat = float(story.get_coordinates()[u"marker"][u"lat"])
+                if (story_lng > right_border) and (story_lng < left_border):
+                    if (story_lat < top_border) and (story_lat > bottom_border):
+                        """
+                        Append dictionary of story into story_list.
+                        """
+                        story_list.append(story.convert_to_dict())
+        """
+        Response story_list converted into JSON.
+        """
+        JSON_story_list = json.dumps(story_list, ensure_ascii=False)
+    return HttpResponse(JSON_story_list)
+
+
+def get_picture_list(request):
+    if request.is_ajax():
+        """
+        Get coordinates of map.
+        """
+        request_body = json.loads(request.body)
+        coordinates = request_body["coordinates"]
+        left_border = float(coordinates['va']['k'])
+        right_border = float(coordinates['va']['j'])
+        bottom_border = float(coordinates['Ca']['k'])
+        top_border = float(coordinates['Ca']['j'])
+        """
+        Filter picture.
+        """
+        picture_list = []
+        pictures = Picture.objects.all()
+        for picture in pictures:
+            story = Story.objects.get(id=picture.story_id)
+            if story.published:
+                if picture.latitude and picture.longitude:
+                    if (picture.longitude > right_border) and (picture.longitude < left_border):
+                        if (picture.latitude < top_border) and (picture.latitude > bottom_border):
+                            """
+                            Append dictionary of picture into picture_list.
+                            """
+                            picture_list.append(picture.convert_to_dict())
+        """
+        Response story_list converted into JSON.
+        """
+        JSON_picture_list = json.dumps(picture_list, ensure_ascii=False)
+    return HttpResponse(JSON_picture_list)
 
 
 @login_required
@@ -355,3 +398,33 @@ def logout(request):
     auth.logout(request)
     request.session[translation.LANGUAGE_SESSION_KEY] = ''
     return redirect('/')
+
+
+@login_required
+@require_POST
+def make_subscription_or_unsubscribe(request, subscribe_on):
+    user = auth.get_user(request)
+    author = User.objects.get(id=int(subscribe_on))
+    action = request.POST.get('action')
+
+    if action == "subscribe":
+        if not Subscriptions.objects.filter(subscriber=user.id,
+                                            subscription=author.id):
+            Subscriptions(subscriber=user, subscription=author).save()
+        return HttpResponse(status=200)
+    else:
+        if Subscriptions.objects.filter(subscriber=user.id,
+                                        subscription=author.id):
+            Subscriptions.objects.filter(
+                subscriber=user.id, subscription=author.id).delete()
+        return HttpResponse(status=200)
+
+
+def general_rss(request):
+    date = datetime.datetime.now().date()
+    yesterday = date - datetime.timedelta(days=1)
+    stories = Story.objects.filter(
+        date_publish__gt=yesterday).order_by("-date_publish")
+    context = {'stories': stories, 'date': date}
+    return render(request, 'rss.xml', context,
+                  content_type="application/xhtml+xml")
