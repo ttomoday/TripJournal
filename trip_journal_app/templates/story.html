@@ -29,8 +29,8 @@
                 <button onclick="subscribe_or_unsubscribe()" 
                         value="{% url 'subscribe' subscribe_on=story.user_id %}"
                         class="subscribe-btn {% if is_subscribed %}unsubscribe{% endif %}"> 
-                    <span class="sibscribe-span">subscribe</span>
-                    <span class="unsibscribe-span">unsubscribe</span>
+                    <span class="sibscribe-span">{% trans "subscribe" %}</span>
+                    <span class="unsibscribe-span">{% trans "unsubscribe" %}</span>
                 </button>
                 <span id="like_story">
                     <span class="likes_count">{{ story.likes_count }}</span>

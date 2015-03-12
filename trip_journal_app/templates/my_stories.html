@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load staticfiles %}
+{% block manifest %}
+    <html manifest="{% static "offline/offline.appcache"%}" type="text/cache-manifest">
+{% endblock %}
 {% load trip_journal_extras %}
 {% block css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static "css/my_stories.css" %}">
+    <link rel="stylesheet" href="{% static "css/my_stories.css" %}">
 {% endblock %}
 {% block title %}My stories{% endblock %}
+{% block scripts %}
+    <script type="text/javascript" src="{% static "javascript/check_cache.js" %}"></script>
+{% endblock %}
 {% block content %}
     <h3>{% trans "Your stories" %}</h3>
     <p id="new_story_link"><a href="{% url "edit" '' %}">{% trans "Create new story" %}</a></p>
@@ -32,7 +38,8 @@
                     </div>
                 </div>
                 <div class="story_buttons">
-                    <form method="GET" action="{% url "edit" story.id %}">
+                    <form method="POST" action="{% url "edit" story.id %}">
+                        {% csrf_token %}
                         <input type="submit" value='{% trans "edit" %}'/>
                     </form>
                     {% include "toggle_publish_buttons.html" with story_id=story.id %}

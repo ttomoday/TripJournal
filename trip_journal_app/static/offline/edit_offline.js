@@ -1,62 +1,45 @@
 var Images = []; //Array of pictures that will be uploaded.
 var Markers = []; //Array of markers, index of marker in this array is equal to the index of the block that it belongs. 
-options = {
-    // Required. Called when a user selects an item in the Chooser.
-    success: function(files) {
-        files.forEach(function(file) {
-            add_img_to_list(file);
-        });
-    },
-    // Optional. Called when the user closes the dialog without selecting a file
-    // and does not include any parameters.
-    cancel: function() {},
-    // Optional. "preview" (default) is a preview link to the document for sharing,
-    // "direct" is an expiring link to download the contents of the file. For more
-    // information about link types, see Link types below.
-    linkType: "preview", // "preview" or "direct"
-    // Optional. A value of false (default) limits selection to a single file, while
-    // true enables multiple file selection.
-    multiselect: true,
-    // Optional. This is a list of file extensions. If specified, the user will
-    // only be able to select files with these extensions. You may also specify
-    // file types, such as "video" or "images" in the list. For more information,
-    // see File types below. By default, all extensions are allowed.
-    extensions: ['.png', '.jpg'],
-};
 
 window.onload = function() {
+    // alert("OFFLINE");
+    setMenu();
     getStoryContent(); // get story content using AJAX
     getStoryTags(); // get story tegs using AJAX
-    initialize(); // initialize the google map API
+
 
     //EventListeners
-    gId('add_title').addEventListener("click", addTitle); // add title of story
-    gId('story_title').addEventListener("blur", savePage); // save page
-    gId('tag_input').addEventListener("change", tags_add); // add tag
-    gId('tag_add').addEventListener("click", tags_add); //
-    gId('type_file').addEventListener("change", add_img);
+    gId('add_title').addEventListener("click", addTitle);
+    gId('story_title').addEventListener("blur", savePage);
+    gId('tag_input').addEventListener("change", tags_add);
+    gId('tag_add').addEventListener("click", tags_add);
+    // gId('type_file').addEventListener("change", add_img);
     gId('story_content').addEventListener("mouseover", showKeybar);
     gId('story_content').addEventListener("mouseout", hideKeybar);
     gId('story_content').addEventListener("click", buttonsClick);
     gId("added_artifact").addEventListener("click", showArtifactPanel);
-    gId("added_image").addEventListener("click", showImagePanel);
+    // gId("added_image").addEventListener("click", showImagePanel);
     gId("added_text").addEventListener("click", showTextPanel);
     gId("adds_block_t").addEventListener("click", save_text_story);
-    gId("adds_block_p").addEventListener("click", save_photo_story);
-    gId('photo_cont').addEventListener("click", deleteImageFromPhotoCont);
+    // gId("adds_block_p").addEventListener("click", save_photo_story);
+    // gId('photo_cont').addEventListener("click", deleteImageFromPhotoCont);
     gId("adds_block_a").addEventListener("click", save_photo_artifact);
-    gId('findAddres').addEventListener("click", codeAddress);
+    // gId('findAddres').addEventListener("click", codeAddress);
     clearBlocks = document.getElementsByClassName("delete_block")
     for (var i = 0; i < clearBlocks.length; i++) {
         clearBlocks[i].addEventListener("click", clear);
     }
-    addDropBox();
 }
 
-function addDropBox(){
-    button = Dropbox.createChooseButton(options);
-    document.getElementById("dropbox-container").appendChild(button);
-
+// Main menu in offline mode
+function setMenu() {
+    var menu = gId('menu');
+    var menu_elements = menu.getElementsByTagName("a");
+    for (var i = 0; i < menu_elements.length; i++) {
+        if (menu_elements[i].getAttribute("href") != "/my_stories/") {
+            menu.children[i].style.display = 'none';
+        }
+    }
 }
 
 //get elements by Id
@@ -66,47 +49,10 @@ function gId(id) {
 
 // Get content from server
 function getStoryContent() {
-    var localStorage_content = getLocalStorageContent();
-    var story_id = storyIdFromUrl();
-    if (story_id) {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var str = xhr.responseText;
-                var content = JSON.parse(str);
-
-                if (getLocalStorageContent()) {
-                    var server_datetime = new Date(content.datetime);
-                    var localStorage_datetime = new Date(localStorage_content.datetime)
-
-                    if (server_datetime < localStorage_datetime) {
-                        initialize_story(localStorage_content);
-                    } else {
-                        initialize_story(content);
-                    }
-
-                } else {
-                    initialize_story(content);
-                }
-                // initialize_story(content);
-            }
-        }
-        params = 'id=' + story_id;
-        xhr.open('GET', '/get_story_content/?' + params, false);
-        xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
-        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-        xhr.send();
-
-    } else if (getLocalStorageContent()) {
-        initialize_story(localStorage_content);
-    }
-}
-
-function getLocalStorageContent() {
     var str = localStorage.getItem("Block_content");
     var content = JSON.parse(str);
     if (content) {
-        return content[0];
+        initialize_story(content[0]);
     }
 }
 
@@ -116,35 +62,14 @@ function initialize_story(content) {
         title_view(content.title);
     }
 
-    if (content.text) {
-        content_list = JSON.parse(content.text);
-        for (var i = 0; i < content_list.length; i++) {
-            var marker = content_list[i].marker
-                // create text block
-            if (content_list[i].type === "text") {
-                text_view(content_list[i].content, marker);
-            }
-            // create artifack block
-            if (content_list[i].type === "artifact") {
-                artifact_view(content_list[i].content, marker);
-            }
-            // create image or gallery block
-            if (content_list[i].type === "img") {
-                var galleryId = content_list[i].galleryId || [content_list[i].id];
-                var imgs = content.picture;
-                show_pictures(galleryId, imgs, marker);
-            }
+    for (var i = 0; i < content.blocks.length; i++) {
+        if (content.blocks[i].type === "text") {
+            text_view(content.blocks[i].content);
         }
-    } else {
-        for (var i = 0; i < content.blocks.length; i++) {
-            if (content.blocks[i].type === "text") {
-                text_view(content.blocks[i].content);
-            }
-            if (content.blocks[i].type === "artifact") {
-                artifact_view(content.blocks[i].content);
-            }
-        };
-    }
+        if (content.blocks[i].type === "artifact") {
+            artifact_view(content.blocks[i].content);
+        }
+    };
 }
 
 // view title on page
@@ -206,17 +131,6 @@ function set_block_coordinates(block_element, coordinates) {
     if (coordinates != null && coordinates != "undefined") {
         block_element.parentNode.setAttribute("data-lat", coordinates.lat);
         block_element.parentNode.setAttribute("data-lng", coordinates.lng);
-    }
-}
-
-// Main menu in offline mode
-function setMenu() {
-    var menu = gId('menu');
-    var menu_elements = menu.getElementsByTagName("a");
-    for (var i = 0; i < menu_elements.length; i++) {
-        if (menu_elements[i].getAttribute("href") != "/my_stories/") {
-            menu.children[i].style.display = 'none';
-        }
     }
 }
 
@@ -403,37 +317,9 @@ function save_photo_story() {
         oneImage = document.createElement("img")
         oneImage.className = "image_story"
         oneImage.src = arr[0].src
-        // put marker if image has GPS coordinates in Exif data
         appendBlock(oneImage, "img");
-        $('#type_file').fileExif(setMarkerFromImageExifData);
-
     }
     clear();
-}
-
-// put marker if image has GPS coordinates in Exif data
-function setMarkerFromImageExifData(exifData) {
-    if (exifData.GPSLatitude && exifData.GPSLongitude) {
-        var lat = ConvertDMSToDD(exifData.GPSLatitude);
-        var lng = ConvertDMSToDD(exifData.GPSLongitude);
-        var myLatlng = new google.maps.LatLng(lat, lng);
-        var countBlock = document.getElementsByClassName("block_story").length - 1
-        indexOfMarket = countBlock
-        setTimeout(function() {
-            placeMarker(myLatlng)
-        }, 200)
-        map.setCenter(myLatlng);
-    }
-}
-
-//convert from degrees, minutes, seconds to decimal degrees coordinates
-function ConvertDMSToDD(dms) {
-    var dmsArray = dms.toString().split(",");
-    var degrees = +dmsArray[0];
-    var minutes = +dmsArray[1];
-    var seconds = +dmsArray[2];
-    var dd = degrees + minutes / 60 + seconds / (60 * 60);
-    return dd;
 }
 
 //change image  on gallery click
@@ -700,36 +586,4 @@ function removeMarker(element) {
         Markers[index] = null;
         savePage();
     }
-}
-
-function add_img_to_list(file) {
-    // var li = document.createElement('li');
-    var a = document.createElement('a');
-    var photo_cont = gId('photo_cont');
-    a.href = file.link;
-    var img = new Image();
-    var src = file.thumbnailLink;
-    //upload image by quality
-    src = src.replace("bounding_box=75", "bounding_box=2048");
-    //helps to crope
-    //src = src.replace("mode=fit", "mode=crop");
-    //image append on screen
-    img.src = src;
-    localStorage.setItem('image', src); // save image data
-    console.log(src);
-    //img.className = "th";
-
-    var img_block = document.createElement("div");
-    img_block.className = "img_block";
-    photo_cont.appendChild(img_block)
-    var img_story = document.createElement("img")
-    img_story.className = "img_story";
-    img_story.src = img.src;
-    img_block.appendChild(img_story);
-    var button_delete = document.createElement("button"); // create button to delete picture
-    button_delete.className = "button_3";
-    var x = document.createTextNode("x");
-    button_delete.appendChild(x)
-    img_block.appendChild(button_delete);
-
 }

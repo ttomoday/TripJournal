@@ -30,11 +30,15 @@ from django.utils.translation import get_language_info
 from django.utils.translation import activate
 from django.utils import translation
 from django.conf import settings as TripJournal_settings
+from localization.views import try_activate_user_language
+from TripJournal.settings import BASE_DIR, STATIC_URL
+
 
 def home(request):
     """
     Home page view.
     """
+    try_activate_user_language(request)
     stories = Story.objects.filter(published=True)
     context = {'stories': stories, 'user': auth.get_user(request)}
     return render(request, 'index.html', context)
@@ -107,6 +111,7 @@ def upload_img(request, story_id):
 
 
 def story(request, story_id):
+    try_activate_user_language(request)
     if story_id:
         return story_contents(request, story_id, 'story.html',
                               check_published=True)
@@ -120,6 +125,8 @@ def edit(request, story_id):
     '''
     Edit page view.
     '''
+    try_activate_user_language(request)
+    change_manifest()
     return story_contents(request, story_id, 'edit.html', check_user=True)
 
 
@@ -138,16 +145,22 @@ def show_story_near_by_page(request):
     """
     Search stories near by page
     """
-    return render(
-        request, 'items_near_by.html', {'item_type': 'stories'})
+    try_activate_user_language(request)
+    args = {}
+    args.update(csrf(request))
+    args['item_type'] = 'story'
+    return render(request, "items_near_by.html", args)
 
 
 def show_picture_near_by_page(request):
     """
     Search pictures near by page
     """
-    return render(
-        request, 'items_near_by.html', {'item_type': 'pictures'})
+    try_activate_user_language(request)
+    args = {}
+    args.update(csrf(request))
+    args['item_type'] = 'picture'
+    return render(request, "items_near_by.html", args)
 
 
 def my_news(request):
@@ -172,51 +185,70 @@ def my_news(request):
     return render(request, 'my_news.html', context)
 
 
-def search_items_near_by(request):
-    if request.method == 'GET':
-        x = float(request.GET.get('latitude', ''))
-        y = float(request.GET.get('longitude', ''))
-        sess = SessionStore()
-        if request.GET.get('item_type', '') == u'pictures':
-            sess['items_list'] = {'item_type': 'pictures',
-                                  'items': Picture.get_sorted_picture_list(x, y)}
-            sess.save()
-        elif request.GET.get('item_type', '') == u'stories':
-            sess['items_list'] = {'item_type': 'stories',
-                                  'items': Story.get_sorted_stories_list(x, y)}
-            sess.save()
-        response = redirect('/pagination/')
-        response.set_cookie('pagination', sess.session_key)
-        return response
+def get_story_list(request):
+    if request.is_ajax():
+        """
+        Get coordinates of map.
+        """
+        request_body = json.loads(request.body)
+        coordinates = request_body["coordinates"]
+        left_border = float(coordinates['va']['k'])
+        right_border = float(coordinates['va']['j'])
+        bottom_border = float(coordinates['Ca']['k'])
+        top_border = float(coordinates['Ca']['j'])
+        """
+        Filter story.
+        """
+        story_list = []
+        stories = Story.objects.filter(published=True)
+        for story in stories:
+            if story.get_coordinates():
+                story_lng = float(story.get_coordinates()[u"marker"][u"lng"])
+                story_lat = float(story.get_coordinates()[u"marker"][u"lat"])
+                if (story_lng > right_border) and (story_lng < left_border):
+                    if (story_lat < top_border) and (story_lat > bottom_border):
+                        """
+                        Append dictionary of story into story_list.
+                        """
+                        story_list.append(story.convert_to_dict())
+        """
+        Response story_list converted into JSON.
+        """
+        JSON_story_list = json.dumps(story_list, ensure_ascii=False)
+    return HttpResponse(JSON_story_list)
 
 
-def make_paging_for_items_search(request):
-    sess_key = request.COOKIES['pagination']
-    sess = SessionStore(session_key=sess_key)
-    list_of_items = sess['items_list']
-    if list_of_items['item_type'] == 'pictures':
-        if not list_of_items['items']:
-            messages.info(request, 'No items found')
-            return redirect('/pictures_near_by/')
-        else:
-            paginator = Paginator(list_of_items['items'], 10)
-    elif list_of_items['item_type'] == 'stories':
-        if not list_of_items['items']:
-            messages.info(request, 'No items found')
-            return redirect('/stories_near_by/')
-        else:
-            paginator = Paginator(list_of_items['items'], 2)
-    page = request.GET.get('page')
-    try:
-        items = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        items = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        items = paginator.page(paginator.num_pages)
-    return render(request, 'items_near_by.html', {'items_list': items,
-                                                  'item_type': list_of_items['item_type']})
+def get_picture_list(request):
+    if request.is_ajax():
+        """
+        Get coordinates of map.
+        """
+        request_body = json.loads(request.body)
+        coordinates = request_body["coordinates"]
+        left_border = float(coordinates['va']['k'])
+        right_border = float(coordinates['va']['j'])
+        bottom_border = float(coordinates['Ca']['k'])
+        top_border = float(coordinates['Ca']['j'])
+        """
+        Filter picture.
+        """
+        picture_list = []
+        pictures = Picture.objects.all()
+        for picture in pictures:
+            story = Story.objects.get(id=picture.story_id)
+            if story.published:
+                if picture.latitude and picture.longitude:
+                    if (picture.longitude > right_border) and (picture.longitude < left_border):
+                        if (picture.latitude < top_border) and (picture.latitude > bottom_border):
+                            """
+                            Append dictionary of picture into picture_list.
+                            """
+                            picture_list.append(picture.convert_to_dict())
+        """
+        Response story_list converted into JSON.
+        """
+        JSON_picture_list = json.dumps(picture_list, ensure_ascii=False)
+    return HttpResponse(JSON_picture_list)
 
 
 @login_required
@@ -242,6 +274,7 @@ def delete(request, story_id):
     user = auth.get_user(request)
     if user != story.user:
         return HttpResponse('Unathorized', status=401)
+    change_manifest()
     story.delete()
     return redirect(reverse('user_stories'))
 
@@ -270,7 +303,7 @@ def get_story_tags(request):
         story = Story.objects.get(pk=story_id)
 
         for tag in story.tags.all():
-            tags_data.append({"name": str(tag), "datetime": str(
+            tags_data.append({"name": unicode(tag), "datetime": unicode(
                 tag.datetime)})
 
         return HttpResponse(json.dumps(tags_data))
@@ -287,11 +320,11 @@ def get_story_content(request):
         pictures = Picture.objects.filter(story_id=int(story_id))
         picture_dic = {}
         for picture in pictures:
-            picture_dic[str(picture.id)] = str(picture.get_stored_pic_by_size(
-                800))
+            picture_dic[unicode(picture.id)] = unicode(
+                picture.get_stored_pic_by_size(800))
 
-        content = {"text": str(story.text), "title": str(story.title),
-                   "datetime": str(story.date_publish),
+        content = {"text": unicode(story.text), "title": unicode(story.title),
+                   "datetime": unicode(story.date_publish),
                    "picture": picture_dic}
 
         return HttpResponse(json.dumps(content))
@@ -308,16 +341,20 @@ def put_tag(request):
     """
     if request.is_ajax():
         request_body = json.loads(request.body)
-        tags = Tag.objects.filter(name=request_body['tag_name'])
-        if not tags:
-            tag = Tag()
-            tag.name = request_body['tag_name']
-            tag.save()
-        else:
-            tag = tags[0]
-        story = Story.objects.get(pk=int(request_body['story_id']))
-        story.tags.add(tag)
-        story.save()
+
+        for tag_from_request in request_body:
+            tags = Tag.objects.filter(name=tag_from_request['tag_name'])
+            if not tags:
+                tag = Tag()
+                tag.name = tag_from_request['tag_name']
+                tag.save()
+            else:
+                tag = tags[0]
+                tag.datetime = datetime.datetime.now()
+                tag.save()
+            story = Story.objects.get(pk=int(tag_from_request['story_id']))
+            story.tags.add(tag)
+            story.save()
         return HttpResponse(status=200)
 
 
@@ -327,6 +364,7 @@ def show_authorization_page(request):
 
 
 def stories_by_user(request):
+    try_activate_user_language(request)
     stor = csrf(request)
     if request.method == 'GET':
         needed_user = str(request.GET.get('needed_user', ''))
@@ -355,7 +393,7 @@ def log_in(request):
     if (code == conf_code.code):
         timeDiffInMinutes = (float(now)-float(conf_code.start_time))/SECONDS_IN_MINUTE
         if timeDiffInMinutes<AUTH_BY_EMAIL["codeExpirationTime"]:
-            if user.username==AUTH_BY_EMAIL["emptyUserName"]:
+            if AUTH_BY_EMAIL["emptyUserName"] in user.username:
                 if userLogin and userLogin!=AUTH_BY_EMAIL["emptyUserName"]:
                     try:
                         user = User.objects.get(username=userLogin)
@@ -363,7 +401,7 @@ def log_in(request):
                     except:
                         user.username = userLogin
                         user.save()
-                elif userLogin==AUTH_BY_EMAIL["emptyUserName"]:
+                elif AUTH_BY_EMAIL["emptyUserName"] in userLogin:
                     return HttpResponse("This login is restricted.")
                 else:
                     return HttpResponse("Please enter your login.")
@@ -390,7 +428,7 @@ def send_code(request):
     try:
         user = User.objects.get(email=email)
     except:
-        user = User.objects.create_user(username=AUTH_BY_EMAIL["emptyUserName"],email=email)
+        user = User.objects.create_user(username=AUTH_BY_EMAIL["emptyUserName"]+str(),email=email)
     code = generate_codeMsg()
     try:
         conf_code = Confirmation_code.objects.get(user_id=user.id)
@@ -414,28 +452,41 @@ def generate_codeMsg():
     return code
 
 
-def check_connection(request):
-    return HttpResponse(status=200)
+def change_manifest():
+    manifest_file = str(BASE_DIR + "/trip_journal_app" + STATIC_URL +
+                        "offline/offline.appcache")
+    now = datetime.datetime.now()
+
+    with open(manifest_file, "r") as actual_file:
+        actual_file.seek(0)
+        new_file = actual_file.readlines()
+    actual_file.close()
+
+    new_file[1] = "# revision {0}\n".format(now)
+    manifest = open(manifest_file, "w")
+    manifest.writelines(new_file)
+    manifest.close()
 
 
 def settings(request):
-    args={}
+    try_activate_user_language(request)
+    args = {}
     args.update(csrf(request))
-    if request.user.is_authenticated():    
-        args['user']=request.user
-    current_language=get_language_info(request.LANGUAGE_CODE)
-    args['current_language']=current_language
-    another_language=[]
+    if request.user.is_authenticated():
+        args['user'] = request.user
+    current_language = get_language_info(request.LANGUAGE_CODE)
+    args['current_language'] = current_language
+    another_language = []
     for lang in TripJournal_settings.LANGUAGES:
         if lang[0] != request.LANGUAGE_CODE:
             another_language.append(get_language_info(lang[0]))
-    args['another_language']=another_language
+    args['another_language'] = another_language
     return render(request, "settings.html", args)
 
 
 def logout(request):
     auth.logout(request)
-    request.session[translation.LANGUAGE_SESSION_KEY] =''
+    request.session[translation.LANGUAGE_SESSION_KEY] = ''
     return redirect('/')
 
 
@@ -462,7 +513,8 @@ def make_subscription_or_unsubscribe(request, subscribe_on):
 def general_rss(request):
     date = datetime.datetime.now().date()
     yesterday = date - datetime.timedelta(days=1)
-    stories = Story.objects.filter(date_publish__gt=yesterday).order_by("-date_publish")
+    stories = Story.objects.filter(
+        date_publish__gt=yesterday).order_by("-date_publish")
     context = {'stories': stories, 'date': date}
     return render(request, 'rss.xml', context,
                   content_type="application/xhtml+xml")

@@ -24,8 +24,6 @@ urlpatterns = [
     # list of nearby stories
     url(r'^stories_near_by/$', views.show_story_near_by_page,
         name='stories_near_by'),
-    url(r'^search_items_near_by/', views.search_items_near_by,
-        name='search_items_near_by'),
     url(r'^$', views.home, name='home'),
     # a link to a profile
     url(r'^my_news/$', views.my_news, name='my_news'),
@@ -34,8 +32,6 @@ urlpatterns = [
     # toggling publish state for story
     url(r'^publish/(?P<story_id>\d+)$', views.publish, name='publish'),
     url(r'^delete/(?P<story_id>\d+)$', views.delete, name='delete'),
-    url(r'^pagination/', views.make_paging_for_items_search,
-        name='make_paging_for_items_search'),
     # get all tags
     url(r'^get_story_tags/$', views.get_story_tags, name='get_tag'),
     # put teg to DB
@@ -46,10 +42,11 @@ urlpatterns = [
     url(r'^get_story_content/$', views.get_story_content, name='get_content'),
     url(r'^authorization_page/', views.show_authorization_page,
         name='show_authorization_page'),
-    # check connection with server
-    url(r'^check_connection', views.check_connection, name='check_connection'),
-    url(r'^settings/$', views.settings ,name='settings'),
-    url(r'^logout/$', views.logout , name='logout'),
+    url(r'^get_story_list/$', views.get_story_list, name='get_story_list'),
+    url(r'^get_picture_list/$', views.get_picture_list,
+        name='get_picture_list'),
+    url(r'^settings/$', views.settings, name='settings'),
+    url(r'^logout/$', views.logout, name='logout'),
     # subscribe on author
     url(r'^subscribe/(?P<subscribe_on>\d+)$',
         views.make_subscription_or_unsubscribe, name='subscribe'),
