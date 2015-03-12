@@ -442,7 +442,7 @@ def send_code(request):
     msg = "Your confirmation code = {0}.\nIt will be avaliable only for {1} minutes".format(code, AUTH_BY_EMAIL["codeExpirationTime"])
     send_mail('Hello!', msg, local_settings.emailHostUser,
     [email])
-    return HttpResponse("Code has been sent to your mail123.")
+    return HttpResponse("Code has been sent to your mail.")
 
 
 
