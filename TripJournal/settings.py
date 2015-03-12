@@ -133,7 +133,7 @@ AUTHENTICATION_BACKENDS = (
 AUTH_BY_EMAIL = {
     "codeExpirationTime": 10,
     "codeLength": 4,
-    "emptyUserName": "restrictedNameForUserCreation",
+    "emptyUserName": "restrictedName",
 }
 
 CLIENT_SECRETS_DIR = os.path.join(BASE_DIR, 'TripJournal', 'client_secrets')

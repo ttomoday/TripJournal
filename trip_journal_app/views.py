@@ -394,7 +394,7 @@ def log_in(request):
         timeDiffInMinutes = (float(now)-float(conf_code.start_time))/SECONDS_IN_MINUTE
         if timeDiffInMinutes<AUTH_BY_EMAIL["codeExpirationTime"]:
             if AUTH_BY_EMAIL["emptyUserName"] in user.username:
-                if userLogin and userLogin!=AUTH_BY_EMAIL["emptyUserName"]:
+                if userLogin and AUTH_BY_EMAIL["emptyUserName"] not in userLogin:
                     try:
                         user = User.objects.get(username=userLogin)
                         return HttpResponse("This login is already used.")
@@ -428,7 +428,7 @@ def send_code(request):
     try:
         user = User.objects.get(email=email)
     except:
-        user = User.objects.create_user(username=AUTH_BY_EMAIL["emptyUserName"]+str(),email=email)
+        user = User.objects.create_user(username=AUTH_BY_EMAIL["emptyUserName"]+str(time.time()),email=email)
     code = generate_codeMsg()
     try:
         conf_code = Confirmation_code.objects.get(user_id=user.id)
