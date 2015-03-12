@@ -260,11 +260,13 @@ function tags_view(tags_arr) {
 
 function deleteStoryTags(i) {
     if (supportsLocalStorage()) {
-        var tags = localStorage.getItem("Tag");
-        var new_tags = JSON.parse(tags);
-        new_tags.splice(i, 1);
-        localStorage.setItem("Tag", JSON.stringify(new_tags));
-        getStoryTags();
+        if (getLocalStorageTags() != null && getLocalStorageTags().length > 0) {
+            var tags = localStorage.getItem("Tag");
+            var new_tags = JSON.parse(tags);
+            new_tags.splice(i, 1);
+            localStorage.setItem("Tag", JSON.stringify(new_tags));
+            getStoryTags();
+        }
     }
     var xhr = new XMLHttpRequest();
     story_id = storyIdFromUrl();
