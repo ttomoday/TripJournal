@@ -513,9 +513,14 @@ def make_subscription_or_unsubscribe(request, subscribe_on):
 def general_rss(request):
     date = datetime.datetime.now().date()
     yesterday = date - datetime.timedelta(days=1)
-    stories = Story.objects.filter(
-        date_publish__gt=yesterday).order_by("-date_publish")
+    stories = Story.objects.filter(date_publish__gt=yesterday).order_by("-date_publish")
+    for story in stories:
+        temp_text = json.loads(story.text)
+        story.text = []
+        for block in temp_text:
+            if 'content' in block:
+                story.text.append(block['content'])
+                print type(story.text)
     context = {'stories': stories, 'date': date}
     return render(request, 'rss.xml', context,
                   content_type="application/xhtml+xml")
-

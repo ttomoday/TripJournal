@@ -9,10 +9,17 @@
     <docs>http://127.0.0.1:8000/</docs>
     {% for story in stories %}
     <item>
+
       <title>{{story.title}}</title>
       <link>http://127.0.0.1:8000/story/{{story.id}}</link>
       <author>{{story.user}}</author>
+      <description>
+      {% for block in story.text %}
+      <p>{{ block }}</p>
+      {% endfor %}
+      </description>
       <pubDate>{{story.date_publish.date}}</pubDate>
+
     </item>
     {% endfor %}
   </channel>
